@@ -1,0 +1,949 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="IrKom">
+<meta name="theme-color" content="#1C1510">
+<link rel="manifest" href="data:application/json,{&quot;name&quot;:&quot;IrKom Kabinet&quot;,&quot;short_name&quot;:&quot;IrKom&quot;,&quot;display&quot;:&quot;standalone&quot;,&quot;background_color&quot;:&quot;#1C1510&quot;,&quot;theme_color&quot;:&quot;#1C1510&quot;,&quot;start_url&quot;:&quot;.&quot;,&quot;icons&quot;:[{&quot;src&quot;:&quot;data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%23A07850'/><text y='.9em' font-size='60' x='15' fill='%231C1510' font-family='serif' font-weight='bold'>IK</text></svg>&quot;,&quot;sizes&quot;:&quot;192x192&quot;}]}">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>IrKom — Klient Kabineti</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Jost:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#F7F3EE;--cream2:#EDE7DE;--cream3:#E3D9CC;
+  --sand:#C9B99A;--bronze:#A07850;--bronze2:#7A5A38;
+  --dark:#1C1510;--dark2:#2A1F18;
+  --text-dark:#1C1510;--text-mid:#6B5744;--text-light:#9C8878;
+  --white:#FDFAF6;--success:#5A8A6A;--warn:#C4783C;--blue:#5A7A9A;
+  --r:14px;--r2:22px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-font-smoothing:antialiased;}
+html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;color:var(--text-dark);overflow-x:hidden;}
+.screen{display:none;min-height:100vh;}
+.screen.active{display:flex;flex-direction:column;}
+
+/* ══ SPLASH ══ */
+#splashScreen{background:var(--dark);position:fixed;inset:0;z-index:9000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;overflow:hidden;}
+#splashScreen.active{display:flex;}
+#splashScreen::before{content:'';position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(160,120,80,.2) 0%,transparent 70%);top:-100px;left:-100px;animation:orb 8s ease-in-out infinite alternate;}
+#splashScreen::after{content:'';position:absolute;width:350px;height:350px;border-radius:50%;background:radial-gradient(circle,rgba(160,120,80,.12) 0%,transparent 70%);bottom:-80px;right:-80px;animation:orb 10s ease-in-out infinite alternate-reverse;}
+@keyframes orb{from{transform:scale(1) translate(0,0);}to{transform:scale(1.15) translate(20px,15px);}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px);}to{opacity:1;transform:translateY(0);}}
+@keyframes slideUp{from{transform:translateY(100%);}to{transform:translateY(0);}}
+
+.splash-inner{position:relative;z-index:1;width:100%;max-width:420px;animation:fadeUp .8s cubic-bezier(.22,1,.36,1) both;}
+.splash-logo{display:flex;flex-direction:column;align-items:center;margin-bottom:36px;}
+.splash-monogram{width:70px;height:70px;border-radius:20px;background:linear-gradient(145deg,var(--bronze),#C49A60);display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:700;color:var(--dark);margin-bottom:14px;box-shadow:0 10px 40px rgba(160,120,80,.4),0 2px 10px rgba(0,0,0,.5);}
+.splash-brand{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:600;color:var(--cream);letter-spacing:3px;}
+.splash-tagline{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--sand);margin-top:6px;font-weight:300;}
+
+.splash-welcome{text-align:center;margin-bottom:32px;}
+.splash-welcome h2{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:500;color:var(--cream);margin-bottom:8px;line-height:1.4;}
+.splash-welcome p{font-size:13px;color:rgba(201,185,154,.7);line-height:1.8;font-weight:300;}
+
+.splash-divider{width:60px;height:1px;background:linear-gradient(90deg,transparent,var(--bronze),transparent);margin:0 auto 28px;}
+
+.guide-list{display:flex;flex-direction:column;gap:10px;margin-bottom:32px;}
+.guide-item{display:flex;align-items:flex-start;gap:14px;padding:14px 16px;background:rgba(247,243,238,.05);border:1px solid rgba(201,185,154,.12);border-radius:14px;backdrop-filter:blur(8px);}
+.gi-icon{font-size:22px;flex-shrink:0;margin-top:1px;}
+.gi-content{}
+.gi-title{font-size:13px;font-weight:500;color:var(--cream);margin-bottom:3px;}
+.gi-desc{font-size:11px;color:rgba(201,185,154,.65);line-height:1.5;font-weight:300;}
+
+.splash-btn{width:100%;padding:17px;background:linear-gradient(135deg,var(--bronze),#C49A60);border:none;border-radius:14px;font-family:'Jost',sans-serif;font-size:13px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--dark);cursor:pointer;transition:opacity .2s,transform .2s;box-shadow:0 6px 24px rgba(160,120,80,.35);}
+.splash-btn:hover{opacity:.92;transform:translateY(-1px);}
+.splash-note{text-align:center;font-size:10px;color:rgba(201,185,154,.4);margin-top:14px;letter-spacing:.5px;}
+
+/* ══ GUIDE MODAL (help) ══ */
+#guideModal{display:none;position:fixed;inset:0;background:rgba(28,21,16,.7);z-index:8000;align-items:flex-end;justify-content:center;backdrop-filter:blur(5px);}
+#guideModal.open{display:flex;}
+.guide-modal-box{background:var(--dark);border-radius:24px 24px 0 0;width:100%;max-width:540px;max-height:88vh;overflow-y:auto;padding:24px 18px 48px;animation:slideUp .35s cubic-bezier(.22,1,.36,1) both;}
+.gm-handle{width:40px;height:4px;border-radius:99px;background:rgba(201,185,154,.2);margin:0 auto 20px;}
+.gm-title{font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:600;color:var(--cream);text-align:center;margin-bottom:6px;}
+.gm-sub{font-size:11px;color:rgba(201,185,154,.5);text-align:center;letter-spacing:1px;text-transform:uppercase;margin-bottom:24px;}
+.gm-divider{width:50px;height:1px;background:linear-gradient(90deg,transparent,var(--bronze),transparent);margin:0 auto 24px;}
+.gm-guide-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.gm-item{display:flex;gap:14px;padding:14px 16px;background:rgba(247,243,238,.04);border:1px solid rgba(201,185,154,.1);border-radius:14px;}
+.gm-icon{font-size:22px;flex-shrink:0;}
+.gm-content{}
+.gm-item-title{font-size:13px;font-weight:500;color:var(--cream);margin-bottom:3px;}
+.gm-item-desc{font-size:11px;color:rgba(201,185,154,.6);line-height:1.5;}
+.gm-close-btn{width:100%;padding:14px;background:rgba(201,185,154,.08);border:1px solid rgba(201,185,154,.15);border-radius:12px;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;color:var(--sand);cursor:pointer;transition:background .2s;}
+.gm-close-btn:hover{background:rgba(201,185,154,.14);}
+
+/* ══ HELP FAB ══ */
+.help-fab{position:fixed;bottom:84px;right:16px;z-index:500;width:40px;height:40px;border-radius:50%;background:var(--dark);border:1.5px solid rgba(201,185,154,.2);color:rgba(201,185,154,.7);font-size:16px;cursor:pointer;display:none;align-items:center;justify-content:center;box-shadow:0 2px 12px rgba(28,21,16,.25);transition:all .2s;font-family:'Cormorant Garamond',serif;font-weight:600;}
+.help-fab:hover{background:var(--dark2);color:var(--sand);border-color:rgba(201,185,154,.4);}
+.help-fab.visible{display:flex;}
+
+/* ══ LOGIN ══ */
+#loginScreen{background:var(--dark);align-items:center;justify-content:center;position:relative;overflow:hidden;}
+#loginScreen::before{content:'';position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(circle,rgba(160,120,80,.18) 0%,transparent 70%);top:-100px;left:-150px;animation:orb 8s ease-in-out infinite alternate;}
+#loginScreen::after{content:'';position:absolute;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(160,120,80,.12) 0%,transparent 70%);bottom:-80px;right:-80px;animation:orb 10s ease-in-out infinite alternate-reverse;}
+.login-box{position:relative;z-index:10;width:100%;max-width:400px;padding:20px;animation:fadeUp .9s cubic-bezier(.22,1,.36,1) both;}
+.login-logo{text-align:center;margin-bottom:44px;}
+.monogram{width:64px;height:64px;border-radius:18px;background:linear-gradient(145deg,var(--bronze),#C49A60);display:inline-flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:22px;font-weight:700;color:var(--dark);margin-bottom:16px;box-shadow:0 8px 32px rgba(160,120,80,.35),0 2px 8px rgba(0,0,0,.4);}
+.login-logo h1{font-family:'Cormorant Garamond',serif;font-size:26px;font-weight:600;color:var(--cream);letter-spacing:2px;}
+.login-logo p{font-size:11px;letter-spacing:3px;text-transform:uppercase;color:var(--sand);margin-top:6px;font-weight:300;}
+.login-card{background:rgba(247,243,238,.05);border:1px solid rgba(201,185,154,.18);backdrop-filter:blur(20px);border-radius:var(--r2);padding:36px 32px;}
+.login-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--sand);margin-bottom:10px;display:block;}
+.login-input{width:100%;background:rgba(255,255,255,.06);border:1px solid rgba(201,185,154,.2);border-radius:12px;padding:16px 18px;font-family:'Jost',sans-serif;font-size:16px;font-weight:300;color:var(--cream);outline:none;letter-spacing:1px;transition:border-color .3s,background .3s;margin-bottom:20px;}
+.login-input:focus{border-color:rgba(201,185,154,.55);background:rgba(255,255,255,.09);}
+.login-input::placeholder{color:rgba(201,185,154,.3);letter-spacing:1px;font-size:14px;}
+.pin-wrap{position:relative;}
+.pin-dots{display:flex;gap:12px;position:absolute;right:18px;top:50%;transform:translateY(-65%);pointer-events:none;}
+.pin-dot{width:8px;height:8px;border-radius:50%;border:1.5px solid rgba(201,185,154,.4);background:transparent;transition:background .2s;}
+.pin-dot.filled{background:var(--sand);border-color:var(--sand);}
+.login-btn{width:100%;padding:16px;background:linear-gradient(135deg,var(--bronze),#C49A60);border:none;border-radius:12px;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;letter-spacing:2.5px;text-transform:uppercase;color:var(--dark);cursor:pointer;margin-top:8px;transition:opacity .2s,transform .2s;box-shadow:0 4px 20px rgba(160,120,80,.3);}
+.login-btn:hover{opacity:.9;transform:translateY(-1px);}
+.login-error{color:#E07070;font-size:12px;text-align:center;margin-top:14px;min-height:18px;}
+
+/* ══ TOPBAR ══ */
+.topbar{background:var(--white);border-bottom:1px solid var(--cream3);padding:0 18px;height:58px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.topbar-brand{display:flex;align-items:center;gap:10px;}
+.topbar-logo{width:34px;height:34px;background:linear-gradient(145deg,var(--bronze),#C49A60);border-radius:9px;display:flex;align-items:center;justify-content:center;font-family:'Cormorant Garamond',serif;font-size:13px;font-weight:700;color:var(--dark);}
+.topbar-title{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:600;color:var(--dark);letter-spacing:1px;}
+.topbar-right{display:flex;align-items:center;gap:10px;}
+.client-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,var(--cream3),var(--sand));display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:600;color:var(--bronze2);font-family:'Cormorant Garamond',serif;}
+.logout-btn{background:none;border:none;font-size:17px;cursor:pointer;color:var(--text-light);padding:4px;}
+.logout-btn:hover{color:var(--bronze);}
+.notif-btn{position:relative;background:none;border:none;font-size:20px;cursor:pointer;padding:4px;}
+.notif-badge{position:absolute;top:0;right:0;width:14px;height:14px;background:var(--warn);border-radius:50%;font-size:8px;font-weight:700;color:white;display:flex;align-items:center;justify-content:center;border:2px solid var(--white);}
+
+/* ══ BOTTOM NAV ══ */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--dark);border-top:1px solid rgba(201,185,154,.12);display:flex;z-index:99;padding-bottom:env(safe-area-inset-bottom);}
+.bn-btn{flex:1;padding:13px 4px 11px;border:none;background:transparent;display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer;transition:all .25s;font-family:'Jost',sans-serif;position:relative;}
+.bn-btn.active::before{content:'';position:absolute;top:0;left:20%;right:20%;height:2px;background:linear-gradient(90deg,transparent,var(--bronze),transparent);border-radius:0 0 4px 4px;}
+.bn-icon{font-size:19px;line-height:1;}
+.bn-label{font-size:10px;letter-spacing:.5px;color:rgba(201,185,154,.45);}
+.bn-btn.active .bn-label{color:var(--sand);font-weight:500;}
+.bn-btn.active .bn-icon{transform:scale(1.08);}
+
+/* ══ CONTENT ══ */
+.dash-content{flex:1;padding:22px 18px 100px;max-width:680px;width:100%;margin:0 auto;}
+.page{display:none;}
+.page.active{display:block;animation:fadeUp .3s ease both;}
+.welcome-row{margin-bottom:22px;}
+.welcome-row h2{font-family:'Cormorant Garamond',serif;font-size:24px;font-weight:600;color:var(--dark);line-height:1.2;}
+.welcome-row p{font-size:12px;color:var(--text-light);margin-top:4px;font-weight:300;}
+
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:3px;background:var(--cream2);border-radius:14px;padding:3px;margin-bottom:22px;}
+.tab-btn{padding:12px 8px;border:none;background:transparent;border-radius:11px;font-family:'Jost',sans-serif;font-size:12px;color:var(--text-mid);cursor:pointer;transition:all .25s;text-align:center;}
+.tab-btn.active{background:var(--white);color:var(--dark);font-weight:500;box-shadow:0 2px 12px rgba(28,21,16,.08);}
+.tab-icon{font-size:15px;display:block;margin-bottom:3px;}
+.tab-panel{display:none;}
+.tab-panel.active{display:block;animation:fadeUp .3s ease both;}
+
+/* BIG CARD */
+.big-card{background:linear-gradient(135deg,var(--dark),var(--dark2));border-radius:var(--r2);padding:20px 18px;margin-bottom:12px;position:relative;overflow:hidden;cursor:pointer;transition:box-shadow .2s;}
+.big-card:hover{box-shadow:0 8px 30px rgba(160,120,80,.2);}
+.big-card::before{content:'';position:absolute;top:-25px;right:-25px;width:100px;height:100px;border-radius:50%;background:rgba(160,120,80,.12);}
+.bc-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,185,154,.7);margin-bottom:6px;}
+.bc-value{font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:700;color:var(--cream);line-height:1;}
+.bc-sub{font-size:11px;color:rgba(201,185,154,.55);margin-top:5px;}
+.bc-arrow{position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:18px;color:rgba(201,185,154,.4);}
+
+/* SUM GRID */
+.sum-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-bottom:14px;}
+.sum-card{background:var(--white);border-radius:var(--r);padding:15px 13px;border:1px solid var(--cream3);cursor:pointer;transition:box-shadow .2s,transform .15s;position:relative;overflow:hidden;}
+.sum-card:hover{box-shadow:0 4px 14px rgba(28,21,16,.08);transform:translateY(-1px);}
+.sum-card::after{content:'';position:absolute;top:0;left:0;right:0;height:3px;border-radius:var(--r) var(--r) 0 0;}
+.sum-card.total::after{background:linear-gradient(90deg,var(--bronze),#C49A60);}
+.sum-card.avans::after{background:linear-gradient(90deg,#7A8AAA,#A0B0CC);}
+.sum-card.paid::after{background:linear-gradient(90deg,#5A8A6A,#7AB88A);}
+.sum-card.remain::after{background:linear-gradient(90deg,#C4783C,#E0A060);}
+.sc-label{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:7px;}
+.sc-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;}
+.sc-hint{font-size:10px;color:var(--sand);margin-top:4px;}
+.cv-b{color:var(--bronze);}.cv-g{color:var(--success);}.cv-bl{color:#7A8AAA;}.cv-o{color:var(--warn);}
+
+.progress-section{background:var(--white);border:1px solid var(--cream3);border-radius:var(--r2);padding:18px;margin-bottom:14px;}
+.pr-header{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px;}
+.pr-label{font-size:12px;color:var(--text-mid);}
+.pr-pct{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--bronze);}
+.pr-bar-bg{height:6px;background:var(--cream2);border-radius:99px;overflow:hidden;}
+.pr-bar-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--bronze),#C49A60);transition:width 1s cubic-bezier(.22,1,.36,1);}
+
+/* LOYIHA STATUS */
+.project-2step{background:var(--white);border:1px solid var(--cream3);border-radius:var(--r2);padding:16px 18px;margin-bottom:14px;}
+.p2-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:12px;}
+.p2-row{display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:10px;}
+.p2-step{display:flex;flex-direction:column;align-items:center;gap:6px;}
+.p2-dot{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;border:2px solid var(--cream3);background:var(--white);transition:all .3s;}
+.p2-step.done .p2-dot{background:var(--success);border-color:var(--success);}
+.p2-step.active .p2-dot{background:var(--bronze);border-color:var(--bronze);box-shadow:0 0 0 5px rgba(160,120,80,.12);}
+.p2-label{font-size:11px;font-weight:500;color:var(--text-mid);}
+.p2-step.done .p2-label{color:var(--success);}
+.p2-step.active .p2-label{color:var(--bronze);}
+.p2-line{height:2px;background:var(--cream3);border-radius:99px;flex:1;transition:background .3s;}
+.p2-line.done{background:linear-gradient(90deg,var(--success),var(--cream3));}
+
+/* MATERIALLAR */
+.mat-section{background:var(--white);border:1px solid var(--cream3);border-radius:var(--r2);padding:18px;margin-bottom:14px;}
+.mat-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+.mat-title-text{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);}
+.mat-total-badge{font-family:'Cormorant Garamond',serif;font-size:16px;font-weight:700;color:var(--blue);}
+.mat-item{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:var(--cream);border-radius:9px;border:1px solid var(--cream3);margin-bottom:6px;}
+.mi-name{font-size:13px;font-weight:500;color:var(--dark);}
+.mi-detail{font-size:11px;color:var(--text-light);margin-top:1px;}
+.mi-price{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:700;color:var(--blue);}
+
+/* KALKULYATOR */
+.kurs-display{display:flex;align-items:center;justify-content:space-between;background:var(--white);border:1px solid rgba(160,120,80,.2);border-radius:12px;padding:12px 14px;margin-bottom:14px;}
+.kd-left{font-size:12px;color:var(--text-mid);}
+.kd-rate{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--bronze);}
+.kd-toggle{display:flex;gap:3px;background:var(--cream2);border-radius:8px;padding:3px;}
+.kdt-btn{padding:5px 12px;border:none;background:transparent;border-radius:6px;font-family:'Jost',sans-serif;font-size:11px;color:var(--text-mid);cursor:pointer;transition:all .2s;}
+.kdt-btn.active{background:var(--bronze);color:var(--dark);font-weight:500;}
+.kalk-total-card{background:linear-gradient(145deg,#2C1A0E,#3D2410);border-radius:var(--r2);padding:22px 20px;margin-bottom:18px;position:relative;overflow:hidden;border:1px solid rgba(160,120,80,.25);}
+.kalk-total-card::before{content:'';position:absolute;top:-30px;right:-30px;width:130px;height:130px;border-radius:50%;background:radial-gradient(circle,rgba(201,160,80,.18) 0%,transparent 70%);}
+.ktc-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:rgba(201,185,154,.6);margin-bottom:8px;}
+.ktc-som{font-family:'Cormorant Garamond',serif;font-size:32px;font-weight:700;color:#F0E6D6;line-height:1;}
+.ktc-usd{font-family:'Cormorant Garamond',serif;font-size:17px;color:rgba(201,160,80,.75);margin-top:6px;}
+.srv-title{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--dark);margin-bottom:12px;}
+.service-card{background:var(--white);border:1px solid var(--cream3);border-radius:var(--r2);margin-bottom:10px;overflow:hidden;}
+.srv-head{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;cursor:pointer;transition:background .15s;}
+.srv-head:hover{background:var(--cream);}
+.sh-left{display:flex;align-items:center;gap:11px;}
+.sh-icon{width:36px;height:36px;border-radius:9px;background:var(--cream2);display:flex;align-items:center;justify-content:center;font-size:17px;flex-shrink:0;}
+.sh-name{font-size:14px;font-weight:500;color:var(--dark);}
+.sh-range{font-size:11px;color:var(--text-light);margin-top:1px;}
+.sh-right{display:flex;align-items:center;gap:8px;}
+.sh-total{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:700;color:var(--bronze);}
+.sh-chev{font-size:15px;color:var(--text-light);transition:transform .25s;}
+.service-card.open .sh-chev{transform:rotate(90deg);}
+.srv-body{display:none;border-top:1px solid var(--cream2);padding:14px;}
+.service-card.open .srv-body{display:block;}
+.ps-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:9px;}
+.price-options{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px;}
+.price-opt{padding:7px 13px;background:var(--cream);border:1.5px solid var(--cream3);border-radius:8px;font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:600;color:var(--text-mid);cursor:pointer;transition:all .2s;}
+.price-opt:hover{border-color:var(--sand);}
+.price-opt.selected{background:rgba(160,120,80,.1);border-color:var(--bronze);color:var(--bronze);}
+.m2-row{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
+.m2-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);white-space:nowrap;}
+.m2-input{background:var(--white);border:1px solid var(--cream3);border-radius:8px;padding:9px 12px;font-family:'Jost',sans-serif;font-size:14px;color:var(--text-dark);outline:none;width:100px;}
+.m2-input:focus{border-color:var(--sand);}
+.m2-unit{font-size:11px;color:var(--text-light);}
+.calc-result{background:var(--cream);border-radius:10px;padding:12px 13px;display:flex;justify-content:space-between;align-items:center;}
+.cr-formula{font-size:11px;color:var(--text-light);}
+.cr-usd{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;color:var(--bronze);}
+.cr-som{font-size:11px;color:var(--text-light);margin-top:2px;}
+.sum-table{background:var(--white);border:1px solid var(--cream3);border-radius:var(--r2);overflow:hidden;margin-bottom:14px;}
+.st-head{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:10px 13px;background:var(--cream2);font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);}
+.st-row{display:grid;grid-template-columns:1fr auto auto;gap:8px;padding:11px 13px;border-top:1px solid var(--cream3);align-items:center;}
+.str-name{font-size:13px;font-weight:500;color:var(--dark);}
+.str-detail{font-size:11px;color:var(--text-light);margin-top:2px;}
+.str-usd{font-family:'Cormorant Garamond',serif;font-size:14px;font-weight:700;color:var(--bronze);text-align:right;}
+.str-som{font-size:10px;color:var(--text-light);text-align:right;}
+.str-del{background:none;border:none;font-size:13px;cursor:pointer;color:var(--text-light);padding:3px;}
+.str-del:hover{color:#C44;}
+.grand-total{background:linear-gradient(135deg,var(--dark),var(--dark2));border-radius:var(--r2);padding:16px 18px;margin-bottom:16px;}
+.gt-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.gt-row:last-child{margin-bottom:0;}
+.gt-label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:rgba(201,185,154,.6);}
+.gt-val{font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:700;color:var(--cream);}
+.gt-val.big{font-size:24px;color:#C49A60;}
+
+/* BILDIRISHNOMALAR */
+.notif-item{background:var(--white);border:1px solid var(--cream3);border-radius:13px;padding:13px 14px;margin-bottom:8px;display:flex;gap:11px;align-items:flex-start;position:relative;overflow:hidden;}
+.notif-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.notif-item.unread::before{background:var(--warn);}
+.notif-item.read::before{background:var(--cream3);}
+.ni-icon{font-size:22px;flex-shrink:0;margin-top:1px;}
+.ni-title{font-size:13px;font-weight:500;color:var(--dark);margin-bottom:3px;}
+.ni-text{font-size:12px;color:var(--text-mid);line-height:1.5;font-weight:300;}
+.ni-time{font-size:10px;color:var(--text-light);margin-top:5px;}
+
+/* MODAL */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(28,21,16,.6);z-index:200;align-items:flex-end;justify-content:center;backdrop-filter:blur(5px);}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--white);border-radius:24px 24px 0 0;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;padding:24px 18px 48px;animation:slideUp .35s cubic-bezier(.22,1,.36,1) both;}
+.m-handle{width:40px;height:4px;border-radius:99px;background:var(--cream3);margin:0 auto 16px;}
+.m-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;}
+.m-title{font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:600;color:var(--dark);}
+.m-close{background:none;border:none;font-size:20px;color:var(--text-light);cursor:pointer;}
+.m-sec-title{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);padding-bottom:7px;border-bottom:1px solid var(--cream2);margin-bottom:10px;}
+.data-row{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;background:var(--cream);border-radius:9px;border:1px solid var(--cream3);margin-bottom:6px;}
+.dr-name{font-size:13px;font-weight:500;color:var(--dark);}
+.dr-sub{font-size:11px;color:var(--text-light);margin-top:2px;}
+.dr-val{font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.stat-item{background:var(--cream);border-radius:10px;padding:12px;}
+.si-label{font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:5px;}
+.si-val{font-family:'Cormorant Garamond',serif;font-size:17px;font-weight:700;}
+.close-m-btn{width:100%;padding:13px;background:var(--cream2);border:none;border-radius:12px;font-family:'Jost',sans-serif;font-size:14px;font-weight:500;color:var(--text-mid);cursor:pointer;margin-top:14px;}
+
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--dark);color:var(--cream);padding:11px 22px;border-radius:99px;font-size:13px;z-index:9999;transition:transform .4s cubic-bezier(.22,1,.36,1),opacity .4s;opacity:0;white-space:nowrap;max-width:calc(100vw - 36px);text-align:center;}
+.toast.show{transform:translateX(-50%) translateY(0);opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- ══ SPLASH SCREEN (birinchi kirish) ══ -->
+<div id="splashScreen">
+  <div class="splash-inner">
+    <div class="splash-logo">
+      <div class="splash-monogram">IK</div>
+      <div class="splash-brand">IRKOM</div>
+      <div class="splash-tagline">Premium ta'mirlash xizmati</div>
+    </div>
+
+    <div class="splash-welcome">
+      <h2>Xush kelibsiz, hurmatli mijoz!</h2>
+      <p>Ushbu ilova sizning vaqtingizni tejash hamda xizmat jarayonini to'liq kuzatib borish maqsadida maxsus tayyorlangan. Bizni tanlaganingiz uchun rahmat!</p>
+    </div>
+
+    <div class="splash-divider"></div>
+
+    <div class="guide-list">
+      <div class="guide-item">
+        <div class="gi-icon">🏠</div>
+        <div class="gi-content">
+          <div class="gi-title">Asosiy — moliyaviy holat</div>
+          <div class="gi-desc">Tamirlash va material bo'yicha umumiy summa, to'langan, avans, qoldiq va to'lov foizi bir joyda.</div>
+        </div>
+      </div>
+      <div class="guide-item">
+        <div class="gi-icon">🏗️</div>
+        <div class="gi-content">
+          <div class="gi-title">Loyiha — jarayon holati</div>
+          <div class="gi-desc">Ish boshlandi yoki tugallandi — loyiha holati va material ro'yxati.</div>
+        </div>
+      </div>
+      <div class="guide-item">
+        <div class="gi-icon">🧮</div>
+        <div class="gi-content">
+          <div class="gi-title">Kalkulyator — narx hisoblash</div>
+          <div class="gi-desc">Ish turini va m² ni tanlang — avtomatik USD va so'mda hisoblaydi.</div>
+        </div>
+      </div>
+      <div class="guide-item">
+        <div class="gi-icon">🔔</div>
+        <div class="gi-content">
+          <div class="gi-title">Xabarlar — bildirishnomalar</div>
+          <div class="gi-desc">Admin tomonidan yuborilgan xabarlar va tizim bildirnomalari.</div>
+        </div>
+      </div>
+    </div>
+
+    <button class="splash-btn" onclick="closeSplash()">DAVOM ETISH</button>
+    <div class="splash-note">Keyingi kirishda bu ekran chiqmaydi · Pastdagi ? tugma orqali qayta ko'rishingiz mumkin</div>
+  </div>
+</div>
+
+<!-- ══ GUIDE MODAL (? tugma) ══ -->
+<div id="guideModal" onclick="if(event.target===this)closeGuideModal()">
+  <div class="guide-modal-box">
+    <div class="gm-handle"></div>
+    <div class="gm-title">Ilova qo'llanmasi</div>
+    <div class="gm-sub">IrKom klient kabineti</div>
+    <div class="gm-divider"></div>
+    <div class="gm-guide-list">
+      <div class="gm-item">
+        <div class="gm-icon">🏠</div>
+        <div class="gm-content">
+          <div class="gm-item-title">Asosiy sahifa</div>
+          <div class="gm-item-desc">Tamirlash va material bo'yicha umumiy summa, to'langan, avans va qoldiq. Har bir kartaga bosib batafsil ko'ring.</div>
+        </div>
+      </div>
+      <div class="gm-item">
+        <div class="gm-icon">🏗️</div>
+        <div class="gm-content">
+          <div class="gm-item-title">Loyiha sahifasi</div>
+          <div class="gm-item-desc">Ish holati (boshlangan / tugallangan) va xaridlangan materiallar ro'yxatini ko'ring.</div>
+        </div>
+      </div>
+      <div class="gm-item">
+        <div class="gm-icon">🧮</div>
+        <div class="gm-content">
+          <div class="gm-item-title">Kalkulyator</div>
+          <div class="gm-item-desc">Ish turini tanlang, m² kiriting — narx USD va so'mda avtomatik hisoblanadi. Bir necha ish turini birga hisoblash mumkin.</div>
+        </div>
+      </div>
+      <div class="gm-item">
+        <div class="gm-icon">🔔</div>
+        <div class="gm-content">
+          <div class="gm-item-title">Bildirishnomalar</div>
+          <div class="gm-item-desc">Admin xabarlari va loyiha yangiliklari bu yerda ko'rinadi.</div>
+        </div>
+      </div>
+      <div class="gm-item">
+        <div class="gm-icon">🔑</div>
+        <div class="gm-content">
+          <div class="gm-item-title">Kirish</div>
+          <div class="gm-item-desc">Ism va 4 raqamli PIN kod bilan kiriladi. PIN kodni admin beradi.</div>
+        </div>
+      </div>
+    </div>
+    <button class="gm-close-btn" onclick="closeGuideModal()">Tushundim</button>
+  </div>
+</div>
+
+<!-- ══ HELP FAB ══ -->
+<button class="help-fab" id="helpFab" onclick="openGuideModal()">?</button>
+
+<!-- ══ LOGIN ══ -->
+<div id="loginScreen" class="screen active">
+  <div class="login-box">
+    <div class="login-logo">
+      <div class="monogram">IK</div>
+      <h1>IRKOM</h1>
+      <p>Klient kabineti</p>
+    </div>
+    <div class="login-card">
+      <label class="login-label">Ism</label>
+      <input class="login-input" type="text" id="nameInput" placeholder="Ismingizni kiriting" maxlength="40" autocomplete="off">
+      <label class="login-label">PIN kod</label>
+      <div class="pin-wrap">
+        <input class="login-input" type="password" id="pinInput" placeholder="• • • •" maxlength="4" inputmode="numeric" autocomplete="off" style="padding-right:90px;letter-spacing:6px;" oninput="onPinInput(this)">
+        <div class="pin-dots" id="pinDots">
+          <div class="pin-dot" id="d1"></div><div class="pin-dot" id="d2"></div>
+          <div class="pin-dot" id="d3"></div><div class="pin-dot" id="d4"></div>
+        </div>
+      </div>
+      <button class="login-btn" onclick="doLogin()">KIRISH</button>
+      <div class="login-error" id="loginError"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DASHBOARD ══ -->
+<div id="dashScreen" class="screen">
+  <div class="topbar">
+    <div class="topbar-brand">
+      <div class="topbar-logo">IK</div>
+      <div class="topbar-title">IrKom</div>
+    </div>
+    <div class="topbar-right">
+      <button class="notif-btn" onclick="switchPage('notiflar',document.querySelectorAll('.bn-btn')[3])">
+        🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span>
+      </button>
+      <div class="client-avatar" id="avatarLetters">IK</div>
+      <button class="logout-btn" onclick="doLogout()">⎋</button>
+    </div>
+  </div>
+
+  <div class="dash-content">
+    <!-- ASOSIY -->
+    <div class="page active" id="pg-asosiy">
+      <div class="welcome-row">
+        <h2 id="welcomeName">Xush kelibsiz 👋</h2>
+        <p id="welcomeSub">Loyiha holati</p>
+      </div>
+      <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('tamir')" id="tab-tamir"><span class="tab-icon">🔨</span>Tamirlash narxi</button>
+        <button class="tab-btn" onclick="switchTab('material')" id="tab-material"><span class="tab-icon">🧱</span>Material narxi</button>
+      </div>
+      <div class="tab-panel active" id="panel-tamir">
+        <div class="big-card" onclick="openModal('tamir','hisob')">
+          <div class="bc-label">Umumiy tamirlash narxi</div>
+          <div class="bc-value" id="t-total-val">—</div>
+          <div class="bc-sub" id="t-total-sub"></div>
+          <div class="bc-arrow">›</div>
+        </div>
+        <div class="sum-grid">
+          <div class="sum-card total" onclick="openModal('tamir','hisob')"><div class="sc-label">Jami summa</div><div class="sc-val cv-b" id="t-jami">—</div><div class="sc-hint">Tafsilot →</div></div>
+          <div class="sum-card avans" onclick="openModal('tamir','avans')"><div class="sc-label">Avans</div><div class="sc-val cv-bl" id="t-avans">—</div><div class="sc-hint">Ko'rish →</div></div>
+          <div class="sum-card paid" onclick="openModal('tamir','tolangan')"><div class="sc-label">To'langan</div><div class="sc-val cv-g" id="t-tolangan">—</div><div class="sc-hint">Tarixi →</div></div>
+          <div class="sum-card remain" onclick="openModal('tamir','qoldiq')"><div class="sc-label">Qoldiq</div><div class="sc-val cv-o" id="t-qoldiq">—</div><div class="sc-hint">Statistika →</div></div>
+        </div>
+        <div class="progress-section">
+          <div class="pr-header"><span class="pr-label">To'lov holati</span><span class="pr-pct" id="t-pct">0%</span></div>
+          <div class="pr-bar-bg"><div class="pr-bar-fill" id="t-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+      <div class="tab-panel" id="panel-material">
+        <div class="big-card" onclick="openModal('material','hisob')">
+          <div class="bc-label">Umumiy material narxi</div>
+          <div class="bc-value" id="m-total-val">—</div>
+          <div class="bc-sub" id="m-total-sub"></div>
+          <div class="bc-arrow">›</div>
+        </div>
+        <div class="sum-grid">
+          <div class="sum-card total" onclick="openModal('material','hisob')"><div class="sc-label">Jami summa</div><div class="sc-val cv-b" id="m-jami">—</div><div class="sc-hint">Tafsilot →</div></div>
+          <div class="sum-card avans" onclick="openModal('material','avans')"><div class="sc-label">Avans</div><div class="sc-val cv-bl" id="m-avans">—</div><div class="sc-hint">Ko'rish →</div></div>
+          <div class="sum-card paid" onclick="openModal('material','tolangan')"><div class="sc-label">To'langan</div><div class="sc-val cv-g" id="m-tolangan">—</div><div class="sc-hint">Tarixi →</div></div>
+          <div class="sum-card remain" onclick="openModal('material','qoldiq')"><div class="sc-label">Qoldiq</div><div class="sc-val cv-o" id="m-qoldiq">—</div><div class="sc-hint">Statistika →</div></div>
+        </div>
+        <div class="progress-section">
+          <div class="pr-header"><span class="pr-label">To'lov holati</span><span class="pr-pct" id="m-pct">0%</span></div>
+          <div class="pr-bar-bg"><div class="pr-bar-fill" id="m-bar" style="width:0%"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- LOYIHA -->
+    <div class="page" id="pg-loyiha">
+      <div class="welcome-row">
+        <h2>Loyiha 🏗️</h2>
+        <p id="loyiha-proj-name">—</p>
+      </div>
+      <!-- 2 BOSQICH -->
+      <div class="project-2step">
+        <div class="p2-title">Ish jarayoni holati</div>
+        <div class="p2-row" id="p2Row">
+          <!-- JS tomonidan render -->
+        </div>
+      </div>
+      <!-- MATERIALLAR -->
+      <div class="mat-section">
+        <div class="mat-header">
+          <div class="mat-title-text">Materiallar ro'yxati</div>
+          <div class="mat-total-badge" id="matTotalBadge">—</div>
+        </div>
+        <div id="matItemsView"></div>
+      </div>
+    </div>
+
+    <!-- KALKULYATOR -->
+    <div class="page" id="pg-kalk">
+      <div class="welcome-row"><h2>Hisob-kitob 🧮</h2><p>Narxni tanlang, m² kiriting</p></div>
+      <div class="kurs-display">
+        <div>
+          <div class="kd-left">💱 1 USD = <span class="kd-rate" id="kursVal">yuklanyapti...</span></div>
+          <div style="font-size:10px;color:var(--text-light);margin-top:2px;" id="kursDate"></div>
+        </div>
+        <div class="kd-toggle">
+          <button class="kdt-btn active" id="btn-usd" onclick="setCurrency('usd')">USD $</button>
+          <button class="kdt-btn" id="btn-uzs" onclick="setCurrency('uzs')">UZS so'm</button>
+        </div>
+      </div>
+      <div class="kalk-total-card">
+        <div class="ktc-label">Tanlangan ishlar jami</div>
+        <div class="ktc-som" id="ktc-som">0 so'm</div>
+        <div class="ktc-usd" id="ktc-usd">≈ $0</div>
+      </div>
+      <div class="srv-title">Ish turlari</div>
+      <div id="servicesList"></div>
+      <div id="summarySection" style="display:none">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+          <div style="font-family:'Cormorant Garamond',serif;font-size:18px;font-weight:600;color:var(--dark);">Tanlangan ishlar</div>
+          <button onclick="clearAll()" style="padding:7px 14px;background:transparent;border:1px solid var(--cream3);border-radius:8px;font-family:'Jost',sans-serif;font-size:11px;color:var(--text-mid);cursor:pointer;">🗑 Tozalash</button>
+        </div>
+        <div class="sum-table"><div class="st-head"><div>Ish nomi</div><div>Narx</div><div></div></div><div id="summaryRows"></div></div>
+        <div class="grand-total">
+          <div class="gt-row"><div class="gt-label">Jami (USD)</div><div class="gt-val" id="gt-usd">$0</div></div>
+          <div class="gt-row"><div class="gt-label">Jami (UZS)</div><div class="gt-val big" id="gt-som">0 so'm</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- BILDIRISHNOMALAR -->
+    <div class="page" id="pg-notiflar">
+      <div class="welcome-row"><h2>Bildirishnomalar 🔔</h2><p id="notif-sub">Barcha xabarlar</p></div>
+      <div id="notifsList"></div>
+    </div>
+  </div>
+
+  <div class="bottom-nav">
+    <button class="bn-btn active" onclick="switchPage('asosiy',this)"><span class="bn-icon">🏠</span><span class="bn-label">Asosiy</span></button>
+    <button class="bn-btn" onclick="switchPage('loyiha',this)"><span class="bn-icon">🏗️</span><span class="bn-label">Loyiha</span></button>
+    <button class="bn-btn" onclick="switchPage('kalk',this)"><span class="bn-icon">🧮</span><span class="bn-label">Kalkulyator</span></button>
+    <button class="bn-btn" onclick="switchPage('notiflar',this)"><span class="bn-icon">🔔</span><span class="bn-label">Xabarlar</span></button>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="m-handle"></div>
+    <div class="m-header"><div class="m-title" id="modalTitle"></div><button class="m-close" onclick="closeModal()">✕</button></div>
+    <div id="modalBody"></div>
+    <button class="close-m-btn" onclick="closeModal()">Yopish</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SB_URL='https://hmkcinbhemfayqiuggir.supabase.co';
+const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhta2NpbmJoZW1mYXlxaXVnZ2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjE2MDUsImV4cCI6MjA5NTI5NzYwNX0.NkmPGWtHwJKfR5K90lRAFmRqdFJ9XMri64Kg9TYnECU';
+const SB_H={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+let USD_RATE=12800,currency='usd',currentClient=null,selected={};
+
+/* ══ SPLASH ══ */
+function checkSplash(){
+  const seen=localStorage.getItem('irkom_splash_seen');
+  if(!seen){
+    document.getElementById('splashScreen').classList.add('active');
+  }
+}
+function closeSplash(){
+  localStorage.setItem('irkom_splash_seen','1');
+  document.getElementById('splashScreen').classList.remove('active');
+}
+function openGuideModal(){document.getElementById('guideModal').classList.add('open');document.body.style.overflow='hidden';}
+function closeGuideModal(){document.getElementById('guideModal').classList.remove('open');document.body.style.overflow='';}
+
+/* ══ HELPERS ══ */
+function fmt(n){if(!n&&n!==0)return'—';return Math.round(n).toLocaleString('uz-UZ')+" so'm";}
+function fmtUSD(n){return '$'+Math.round(n).toLocaleString('uz-UZ');}
+function calcSec(data){
+  const avS=(data.avanslar||[]).reduce((a,x)=>a+x.amount,0);
+  const tolS=(data.tolangan||[]).reduce((a,x)=>a+x.amount,0);
+  const hisobS=(data.hisob||[]).reduce((a,h)=>a+(h.m2*h.price),0);
+  const itemsS=(data.items||[]).reduce((a,m)=>a+(m.qty*(m.price||0)),0);
+  const jami=data.jami||(hisobS||itemsS);
+  const totalPaid=avS+tolS;
+  const qoldiq=Math.max(0,jami-totalPaid);
+  const pct=jami>0?Math.min(100,Math.round((totalPaid/jami)*100)):0;
+  return{avS,tolS,hisobS,itemsS,jami,qoldiq,pct};
+}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
+
+/* ══ DATA ══ */
+const DEMO=[
+  {id:'c1',name:'Jasur Toshmatov',pin:'1234',project:'Chilonzor kvartira',status:'active',
+   tamir:{jami:0,avanslar:[{id:'a1',amount:5000000,date:'15 Yan 2025',note:'Birinchi avans'}],
+     hisob:[{id:'h1',name:'Маляркa',m2:45,price:128000,priceUSD:10,totalUSD:450}],tolangan:[{id:'t1',amount:3200000,date:'20 Yan 2025',note:"To'lov"}]},
+   material:{jami:2500000,avanslar:[],hisob:[],tolangan:[],
+     items:[{id:'m1',name:'Gips qorishi',qty:20,price:55000,unit:'qop'},{id:'m2',name:'Akrilik bo\'yoq',qty:8,price:180000,unit:'l'},{id:'m3',name:'Styajka',qty:15,price:45000,unit:'qop'}]},
+   messages:[{id:'ms1',text:'Ish jarayoni boshlandi. Birinchi bosqich: malyarka.',date:'20 Yan 2025'}]
+  },
+  {id:'c2',name:'Nilufar Karimova',pin:'5678',project:'Yunusobod ofis',status:'done',
+   tamir:{jami:0,avanslar:[],hisob:[{id:'h2',name:'Декор штукатурка',m2:60,price:256000,priceUSD:20,totalUSD:1200},{id:'h3',name:'Обой',m2:30,price:102400,priceUSD:8,totalUSD:240}],tolangan:[{id:'t2',amount:8000000,date:'5 Feb 2025',note:"Asosiy to'lov"}]},
+   material:{jami:1800000,avanslar:[{id:'a2',amount:1800000,date:'2 Feb 2025',note:'Material avans'}],hisob:[],tolangan:[],
+     items:[{id:'m4',name:'Dekor shtukaturka',qty:5,price:220000,unit:'qop'}]},
+   messages:[]
+  }
+];
+async function loadClientData(name,pin){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/clients?select=id,data`,{headers:SB_H});
+    const rows=await r.json();
+    if(rows&&rows.length&&!rows.error){
+      const all=rows.map(r=>r.data).filter(Boolean);
+      localStorage.setItem('irkom_v3',JSON.stringify(all));
+      return all.find(x=>x.name.toLowerCase().includes(name.toLowerCase())&&x.pin===pin)||null;
+    }
+  }catch(e){}
+  // Fallback localStorage
+  const cached=localStorage.getItem('irkom_v3');
+  if(cached){
+    const all=JSON.parse(cached);
+    return all.find(x=>x.name.toLowerCase().includes(name.toLowerCase())&&x.pin===pin)||null;
+  }
+  return null;
+}
+function getClients(){const s=localStorage.getItem('irkom_v3');return s?JSON.parse(s):DEMO;}
+
+/* ══ EXCHANGE RATE ══ */
+async function loadKurs(){
+  // Keshdan tekshir (1 soat)
+  const cached=localStorage.getItem('irkom_usd_rate');
+  if(cached){
+    try{
+      const c=JSON.parse(cached);
+      const age=(Date.now()-c.ts)/1000/60;
+      if(age<60&&c.rate>1000){
+        USD_RATE=c.rate;
+        updateKursUI(c.rate,c.date+' (kesh)');
+        renderCalcTotals();
+      }
+    }catch(e){}
+  }
+  try{
+    // 1-urinish: CBU rasmiy API
+    const r=await fetch('https://cbu.uz/uz/arkhiv-kursov-valyut/json/USD/');
+    const d=await r.json();
+    if(d&&d[0]&&d[0].Rate&&parseFloat(d[0].Rate)>1000){
+      USD_RATE=parseFloat(d[0].Rate);
+      const date='Markaziy Bank · '+d[0].Date;
+      updateKursUI(USD_RATE,date);
+      localStorage.setItem('irkom_usd_rate',JSON.stringify({rate:USD_RATE,date,ts:Date.now()}));
+      renderCalcTotals();renderFinance();
+      return;
+    }
+  }catch(e){}
+  try{
+    // 2-urinish: exchangerate-api
+    const r2=await fetch('https://open.er-api.com/v6/latest/USD');
+    const d2=await r2.json();
+    if(d2&&d2.rates&&d2.rates.UZS&&d2.rates.UZS>1000){
+      USD_RATE=Math.round(d2.rates.UZS);
+      const date='ExchangeRate-API · Bugun';
+      updateKursUI(USD_RATE,date);
+      localStorage.setItem('irkom_usd_rate',JSON.stringify({rate:USD_RATE,date,ts:Date.now()}));
+      renderCalcTotals();renderFinance();
+      return;
+    }
+  }catch(e){}
+  // Fallback
+  const fallback=localStorage.getItem('irkom_usd_rate');
+  if(fallback){
+    try{
+      const c=JSON.parse(fallback);
+      if(c.rate>1000){USD_RATE=c.rate;updateKursUI(c.rate,c.date+' (oxirgi saqlangan)');renderCalcTotals();return;}
+    }catch(e){}
+  }
+  updateKursUI(USD_RATE,'Taxminiy narx');
+  renderCalcTotals();
+}
+function updateKursUI(rate,dateText){
+  const txt=Math.round(rate).toLocaleString('uz-UZ')+' so\'m';
+  const kv=document.getElementById('kursVal');if(kv)kv.textContent=txt;
+  const kd=document.getElementById('kursDate');if(kd)kd.textContent=dateText;
+}
+function setCurrency(c){
+  currency=c;
+  document.getElementById('btn-usd').classList.toggle('active',c==='usd');
+  document.getElementById('btn-uzs').classList.toggle('active',c==='uzs');
+  renderServicesList();renderCalcTotals();renderSummary();
+}
+
+/* ══ LOGIN ══ */
+function onPinInput(inp){const v=inp.value;for(let i=1;i<=4;i++)document.getElementById('d'+i).classList.toggle('filled',v.length>=i);}
+function doLogin(){
+  const name=document.getElementById('nameInput').value.trim();
+  const pin=document.getElementById('pinInput').value.trim();
+  if(!name||!pin){document.getElementById('loginError').textContent='Ism va PIN kiriting';return;}
+  const clients=getClients();
+  const c=clients.find(x=>x.name.toLowerCase().includes(name.toLowerCase())&&x.pin===pin);
+  if(!c){document.getElementById('loginError').textContent='Ism yoki PIN noto\'g\'ri';return;}
+  currentClient=c;
+  document.getElementById('loginScreen').classList.remove('active');
+  document.getElementById('dashScreen').classList.add('active');
+  document.getElementById('helpFab').classList.add('visible');
+  checkSplash();
+  initDash();
+}
+function doLogout(){
+  currentClient=null;
+  document.getElementById('dashScreen').classList.remove('active');
+  document.getElementById('loginScreen').classList.add('active');
+  document.getElementById('helpFab').classList.remove('visible');
+  document.getElementById('nameInput').value='';
+  document.getElementById('pinInput').value='';
+  document.getElementById('loginError').textContent='';
+  for(let i=1;i<=4;i++)document.getElementById('d'+i).classList.remove('filled');
+}
+
+/* ══ INIT ══ */
+function initDash(){
+  const c=currentClient;
+  const ini=c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  document.getElementById('avatarLetters').textContent=ini;
+  document.getElementById('welcomeName').textContent='Salom, '+c.name.split(' ')[0]+' 👋';
+  document.getElementById('welcomeSub').textContent=c.project||'Loyihangiz';
+  document.getElementById('loyiha-proj-name').textContent=c.project||'—';
+  renderFinance();
+  render2Step();
+  renderMatItems();
+  renderNotifs();
+  loadKurs();
+  renderServicesList();
+}
+
+/* ══ FINANCE ══ */
+function renderFinance(){
+  const c=currentClient;
+  ['tamir','material'].forEach(sec=>{
+    const{avS,tolS,jami,qoldiq,pct}=calcSec(c[sec]);
+    const p=sec[0];
+    document.getElementById(p+'-total-val').textContent=currency==='usd'?fmtUSD(jami/USD_RATE):fmt(jami);
+    document.getElementById(p+'-total-sub').textContent='≈ '+(currency==='usd'?fmt(jami):fmtUSD(jami/USD_RATE));
+    document.getElementById(p+'-jami').textContent=currency==='usd'?fmtUSD(jami/USD_RATE):fmt(jami);
+    document.getElementById(p+'-avans').textContent=currency==='usd'?fmtUSD(avS/USD_RATE):fmt(avS);
+    document.getElementById(p+'-tolangan').textContent=currency==='usd'?fmtUSD(tolS/USD_RATE):fmt(tolS);
+    document.getElementById(p+'-qoldiq').textContent=currency==='usd'?fmtUSD(qoldiq/USD_RATE):fmt(qoldiq);
+    document.getElementById(p+'-pct').textContent=pct+'%';
+    document.getElementById(p+'-bar').style.width=pct+'%';
+  });
+}
+
+/* ══ 2 STEP ══ */
+function render2Step(){
+  const c=currentClient;
+  const isDone=c.status==='done';
+  document.getElementById('p2Row').innerHTML=`
+    <div class="p2-step ${isDone?'done':'active'}">
+      <div class="p2-dot">🔨</div>
+      <div class="p2-label">Ish boshlandi</div>
+    </div>
+    <div class="p2-line ${isDone?'done':''}"></div>
+    <div class="p2-step ${isDone?'done':'pending'}">
+      <div class="p2-dot">${isDone?'✓':'🏁'}</div>
+      <div class="p2-label">Ish tugadi</div>
+    </div>`;
+}
+
+/* ══ MATERIALS VIEW ══ */
+function renderMatItems(){
+  const c=currentClient;
+  const items=c.material.items||[];
+  const total=items.reduce((a,m)=>a+(m.qty*(m.price||0)),0)||c.material.jami||0;
+  document.getElementById('matTotalBadge').textContent=total?fmt(total):'—';
+  if(!items.length){
+    document.getElementById('matItemsView').innerHTML='<div style="text-align:center;padding:18px;color:var(--text-light);font-size:12px;">Materiallar kiritilmagan</div>';
+    return;
+  }
+  document.getElementById('matItemsView').innerHTML=items.map(m=>`
+    <div class="mat-item">
+      <div><div class="mi-name">${m.name}</div><div class="mi-detail">${m.qty} ${m.unit} × ${m.price?m.price.toLocaleString()+' so\'m':'—'}</div></div>
+      <div class="mi-price">${fmt(m.qty*(m.price||0))}</div>
+    </div>`).join('');
+}
+
+/* ══ NOTIFICATIONS ══ */
+function renderNotifs(){
+  const c=currentClient;
+  const msgs=c.messages||[];
+  const unread=msgs.filter(m=>!m.read).length;
+  const badge=document.getElementById('notifBadge');
+  badge.textContent=unread;badge.style.display=unread?'flex':'none';
+  document.getElementById('notif-sub').textContent=msgs.length+' ta xabar';
+  const sysNotifs=[
+    {icon:'🏗️',title:'Loyiha holati',text:c.status==='done'?'Loyihangiz muvaffaqiyatli yakunlandi!':'Loyiha ish jarayonida davom etmoqda.',date:'Bugun',unread:false},
+  ];
+  const all=[...msgs.map(m=>({...m,icon:'💬',title:'Admin xabari',unread:!m.read})),...sysNotifs];
+  document.getElementById('notifsList').innerHTML=all.length?all.map(n=>`
+    <div class="notif-item ${n.unread?'unread':'read'}">
+      <div class="ni-icon">${n.icon}</div>
+      <div style="flex:1"><div class="ni-title">${n.title}</div><div class="ni-text">${n.text}</div><div class="ni-time">${n.date}</div></div>
+    </div>`).join(''):'<div style="text-align:center;padding:40px;color:var(--text-light)"><div style="font-size:36px;margin-bottom:10px">🔔</div>Hali xabar yo\'q</div>';
+}
+
+/* ══ TABS & PAGES ══ */
+function switchTab(tab){
+  ['tamir','material'].forEach(t=>{
+    document.getElementById('tab-'+t).classList.toggle('active',t===tab);
+    document.getElementById('panel-'+t).classList.toggle('active',t===tab);
+  });
+}
+function switchPage(name,btn){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.bn-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById('pg-'+name).classList.add('active');
+  if(btn) btn.classList.add('active');
+  if(name==='kalk'){renderServicesList();renderCalcTotals();}
+  if(name==='loyiha'){render2Step();renderMatItems();}
+  if(name==='notiflar'){renderNotifs();}
+}
+
+/* ══ MODAL ══ */
+function openModal(sec,type){
+  const c=currentClient;
+  const data=c[sec];
+  const{avS,tolS,hisobS,itemsS,jami,qoldiq,pct}=calcSec(data);
+  const sLabel=sec==='tamir'?'Tamirlash':'Material';
+  const titles={hisob:sLabel+' · Hisob-kitob',avans:sLabel+' · Avanslar',tolangan:sLabel+' · To\'langan',qoldiq:sLabel+' · Statistika'};
+  document.getElementById('modalTitle').textContent=titles[type];
+  let body='';
+  if(type==='hisob'){
+    /* Tamirlash - kalkulyatordan, Material - items */
+    const isMatSec=sec==='material';
+    const items=isMatSec?(data.items||[]):(data.hisob||[]);
+    const rows=items.length?items.map(h=>{
+      if(isMatSec){
+        const total=h.qty*(h.price||0);
+        return `<div style="background:var(--cream);border-radius:10px;border:1px solid var(--cream3);padding:12px 13px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;">
+          <div><div style="font-size:13px;font-weight:500;color:var(--dark);">${h.name}</div>
+          <div style="font-size:11px;color:var(--text-light);">${h.qty} ${h.unit} × ${h.price?h.price.toLocaleString()+' so\'m':'—'}</div></div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;color:var(--blue);">${fmt(total)}</div>
+        </div>`;
+      } else {
+        const total=h.m2*h.price;
+        const usdTotal=h.totalUSD||(h.priceUSD?h.priceUSD*h.m2:Math.round(total/USD_RATE));
+        const pctH=jami>0?Math.min(100,Math.round((total/jami)*100)):0;
+        return `<div style="background:var(--cream);border-radius:10px;border:1px solid var(--cream3);padding:12px 13px;margin-bottom:6px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <div><div style="font-size:13px;font-weight:500;color:var(--dark);">${h.name}</div>
+            <div style="font-size:11px;color:var(--text-light);">${h.m2} m² × ${h.priceUSD?'$'+h.priceUSD:h.price.toLocaleString()+' so\'m'}/m²</div></div>
+            <div style="text-align:right;"><div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;color:var(--bronze);">$${usdTotal.toLocaleString()}</div>
+            <div style="font-size:10px;color:var(--text-light);">${total.toLocaleString()} so'm</div></div>
+          </div>
+          <div style="height:3px;background:var(--cream3);border-radius:99px;overflow:hidden;"><div style="height:100%;width:${pctH}%;background:linear-gradient(90deg,var(--bronze),#C49A60);border-radius:99px;"></div></div>
+        </div>`;
+      }
+    }).join(''):'<div style="text-align:center;padding:20px;color:var(--text-light);">Hali kiritilmagan</div>';
+    const totalVal=isMatSec?itemsS:hisobS;
+    body=`<div class="m-sec-title">Jami: ${fmtUSD(totalVal/USD_RATE)} · ${fmt(totalVal)}</div>${rows}`;
+  }
+  else if(type==='avans'){
+    const rows=(data.avanslar||[]).length?`${(data.avanslar||[]).map(a=>`<div class="data-row"><div><div class="dr-name">${a.note||'Avans'}</div><div class="dr-sub">📅 ${a.date}</div></div><div class="dr-val cv-bl">+${fmt(a.amount)}</div></div>`).join('')}`:'<div style="text-align:center;padding:20px;color:var(--text-light);">Avanslar yo\'q</div>';
+    body=`<div class="m-sec-title">Jami avans: ${fmt(avS)}</div>${rows}`;
+  }
+  else if(type==='tolangan'){
+    const rows=(data.tolangan||[]).length?`${(data.tolangan||[]).map(t=>`<div class="data-row"><div><div class="dr-name">${t.note||"To'lov"}</div><div class="dr-sub">📅 ${t.date}</div></div><div class="dr-val cv-g">+${fmt(t.amount)}</div></div>`).join('')}`:'<div style="text-align:center;padding:20px;color:var(--text-light);">To\'lovlar yo\'q</div>';
+    body=`<div class="m-sec-title">Jami to'langan: ${fmt(tolS)}</div>${rows}`;
+  }
+  else if(type==='qoldiq'){
+    body=`<div class="stats-grid">
+      <div class="stat-item"><div class="si-label">Umumiy narx</div><div class="si-val cv-b">${fmt(jami)}</div></div>
+      <div class="stat-item"><div class="si-label">To'langan</div><div class="si-val cv-g">${fmt(tolS)}</div></div>
+      <div class="stat-item"><div class="si-label">Avans</div><div class="si-val cv-bl">${fmt(avS)}</div></div>
+      <div class="stat-item"><div class="si-label">Qoldiq</div><div class="si-val cv-o">${fmt(qoldiq)}</div></div>
+      <div class="stat-item" style="grid-column:1/-1"><div class="si-label">To'lov foizi</div>
+        <div style="margin-top:8px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text-mid)">Bajarildi</span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--bronze)">${pct}%</span></div>
+        <div style="height:7px;background:var(--cream2);border-radius:99px;overflow:hidden"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--bronze),#C49A60);border-radius:99px"></div></div></div>
+      </div>
+    </div>`;
+  }
+  document.getElementById('modalBody').innerHTML=body;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow='';}
+
+/* ══ KALKULYATOR ══ */
+const SERVICES=[
+  {id:'s1',icon:'🖌️',name:'Маляркa',range:[7,20],options:[7,10,12,15,18,20]},
+  {id:'s2',icon:'🌿',name:'Обой',range:[8,8],options:[8]},
+  {id:'s3',icon:'🪨',name:'Травертин',range:[14,14],options:[14]},
+  {id:'s4',icon:'🏺',name:'Оточенто',range:[10,10],options:[10]},
+  {id:'s5',icon:'🎨',name:'Трафарет',range:[25,25],options:[25]},
+  {id:'s6',icon:'🗻',name:'Скала',range:[25,100],options:[25,40,60,80,100]},
+  {id:'s7',icon:'🏛️',name:'Декор штукатурка',range:[15,35],options:[15,20,25,30,35]},
+  {id:'s8',icon:'🧱',name:'Сувоқ',range:[4,8],options:[4,5,6,7,8]},
+];
+function toggleSrv(sid){const c=document.getElementById('sc-'+sid);if(selected[sid]){delete selected[sid];c.classList.remove('open');}else{selected[sid]={price:null,m2:0};c.classList.add('open');}renderCalcTotals();renderSummary();}
+function setPrice(sid,price){
+  if(!selected[sid]) selected[sid]={price:null,m2:0};selected[sid].price=price;
+  document.querySelectorAll('.po-'+sid).forEach(b=>b.classList.toggle('selected',parseFloat(b.dataset.price)===price));
+  const ci=document.getElementById('custom-'+sid);if(ci)ci.value='';
+  renderCalcTotals();renderSummary();updateSrvTotal(sid);updateFormula(sid);
+}
+function setCustomPrice(sid){const val=parseFloat(document.getElementById('custom-'+sid).value)||null;if(!selected[sid])selected[sid]={price:null,m2:0};selected[sid].price=val;document.querySelectorAll('.po-'+sid).forEach(b=>b.classList.remove('selected'));renderCalcTotals();renderSummary();updateSrvTotal(sid);}
+function setM2(sid){const val=parseFloat(document.getElementById('m2k-'+sid).value)||0;if(!selected[sid])selected[sid]={price:null,m2:0};selected[sid].m2=val;renderCalcTotals();renderSummary();updateSrvTotal(sid);updateFormula(sid);}
+function updateSrvTotal(sid){const s=selected[sid];const el=document.getElementById('st-'+sid);if(!el)return;if(s&&s.price&&s.m2){const usd=s.price*s.m2;el.innerHTML=currency==='usd'?`<b style="color:var(--bronze);font-family:'Cormorant Garamond',serif;font-size:15px">$${usd.toLocaleString()}</b>`:`<b style="color:var(--bronze);font-family:'Cormorant Garamond',serif;font-size:15px">${Math.round(usd*USD_RATE).toLocaleString()} so'm</b>`;}else el.innerHTML='';}
+function updateFormula(sid){const s=selected[sid];const f=document.getElementById('formula-'+sid);const ru=document.getElementById('res-usd-'+sid);const rs=document.getElementById('res-som-'+sid);if(!f)return;if(s&&s.price&&s.m2){const usd=s.price*s.m2;f.textContent=`$${s.price} × ${s.m2} m²`;ru.textContent='$'+usd.toLocaleString();rs.textContent=Math.round(usd*USD_RATE).toLocaleString()+' so\'m';}else{f.textContent='Narx va maydonni tanlang';ru.textContent='';rs.textContent='';}}
+function getTotalUSD(){let t=0;Object.entries(selected).forEach(([sid,s])=>{if(s.price&&s.m2)t+=s.price*s.m2;});return t;}
+function renderCalcTotals(){const usd=getTotalUSD();const som=usd*USD_RATE;document.getElementById('ktc-som').textContent=Math.round(som).toLocaleString('uz-UZ')+' so\'m';document.getElementById('ktc-usd').textContent='≈ $'+usd.toLocaleString('uz-UZ');const gu=document.getElementById('gt-usd');const gs=document.getElementById('gt-som');if(gu)gu.textContent='$'+usd.toLocaleString('uz-UZ');if(gs)gs.textContent=Math.round(som).toLocaleString('uz-UZ')+' so\'m';}
+function renderSummary(){const items=Object.entries(selected).filter(([s,v])=>v.price&&v.m2);const sec=document.getElementById('summarySection');sec.style.display=items.length?'block':'none';if(!items.length)return;document.getElementById('summaryRows').innerHTML=items.map(([sid,s])=>{const srv=SERVICES.find(x=>x.id===sid);const usd=s.price*s.m2;const som=Math.round(usd*USD_RATE);return `<div class="st-row"><div><div class="str-name">${srv.icon} ${srv.name}</div><div class="str-detail">$${s.price}/m² × ${s.m2} m²</div></div><div><div class="str-usd">$${usd.toLocaleString()}</div><div class="str-som">${som.toLocaleString()} so'm</div></div><button class="str-del" onclick="removeItem('${sid}')">✕</button></div>`;}).join('');}
+function removeItem(sid){delete selected[sid];renderServicesList();renderCalcTotals();renderSummary();}
+function clearAll(){selected={};renderServicesList();renderCalcTotals();renderSummary();}
+function renderServicesList(){
+  const container=document.getElementById('servicesList');
+  container.innerHTML=SERVICES.map(srv=>{
+    const isOpen=!!selected[srv.id];const s=selected[srv.id]||{};
+    const rangeStr=srv.range[0]===srv.range[1]?`$${srv.range[0]}`:`$${srv.range[0]} — $${srv.range[1]}`;
+    const usd=(s.price&&s.m2)?s.price*s.m2:0;
+    const displayVal=usd>0?(currency==='usd'?`$${usd.toLocaleString()}`:`${Math.round(usd*USD_RATE).toLocaleString()} so'm`):'';
+    return `<div class="service-card${isOpen?' open':''}" id="sc-${srv.id}">
+      <div class="srv-head" onclick="toggleSrv('${srv.id}')">
+        <div class="sh-left"><div class="sh-icon">${srv.icon}</div><div><div class="sh-name">${srv.name}</div><div class="sh-range">${rangeStr} / m²</div></div></div>
+        <div class="sh-right"><div class="sh-total" id="st-${srv.id}">${displayVal}</div><div class="sh-chev">›</div></div>
+      </div>
+      <div class="srv-body">
+        <div class="ps-label">Narxni tanlang ($ / m²)</div>
+        <div class="price-options">${srv.options.map(p=>`<div class="price-opt po-${srv.id}${s.price===p?' selected':''}" data-price="${p}" onclick="setPrice('${srv.id}',${p})">$${p}</div>`).join('')}</div>
+        ${srv.range[0]!==srv.range[1]?`<div style="display:flex;align-items:center;gap:6px;margin-bottom:12px;"><span style="font-size:11px;color:var(--text-light);">Boshqa:</span><input style="background:var(--white);border:1px solid var(--cream3);border-radius:7px;padding:7px 9px;font-family:'Cormorant Garamond',serif;font-size:13px;color:var(--text-dark);outline:none;width:80px;" type="number" id="custom-${srv.id}" placeholder="$" oninput="setCustomPrice('${srv.id}')" value="${s.price&&!srv.options.includes(s.price)?s.price:''}"><span style="font-size:11px;color:var(--text-light);">$</span></div>`:''}
+        <div class="m2-row"><span class="m2-label">Maydon:</span><input class="m2-input" type="number" id="m2k-${srv.id}" placeholder="0" oninput="setM2('${srv.id}')" value="${s.m2||''}"><span class="m2-unit">m²</span></div>
+        <div class="calc-result"><div class="cr-formula" id="formula-${srv.id}">${s.price&&s.m2?`$${s.price} × ${s.m2} m²`:'Narx va maydonni tanlang'}</div><div style="text-align:right"><div class="cr-usd" id="res-usd-${srv.id}">${s.price&&s.m2?'$'+(s.price*s.m2).toLocaleString():''}</div><div class="cr-som" id="res-som-${srv.id}">${s.price&&s.m2?Math.round(s.price*s.m2*USD_RATE).toLocaleString()+' so\'m':''}</div></div></div>
+      </div>
+    </div>`;
+  }).join('');
+  SERVICES.forEach(srv=>{
+    const el=document.getElementById('m2k-'+srv.id);if(el)el.addEventListener('input',()=>{setM2(srv.id);updateFormula(srv.id);});
+    const cel=document.getElementById('custom-'+srv.id);if(cel)cel.addEventListener('input',()=>{setCustomPrice(srv.id);updateFormula(srv.id);});
+  });
+}
+
+/* ══ INIT CHECK ══ */
+// Splash faqat login qilgandan keyin tekshiriladi
+</script>
+</body>
+</html>
