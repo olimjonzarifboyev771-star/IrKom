@@ -566,13 +566,15 @@ let USD_RATE=12800,currency='usd',currentClient=null,selected={};
 
 /* ══ SPLASH ══ */
 function checkSplash(){
-  const seen=localStorage.getItem('irkom_splash_seen');
+  const key='irkom_splash_'+currentClient.id;
+  const seen=localStorage.getItem(key);
   if(!seen){
     document.getElementById('splashScreen').classList.add('active');
   }
 }
 function closeSplash(){
-  localStorage.setItem('irkom_splash_seen','1');
+  const key='irkom_splash_'+currentClient.id;
+  localStorage.setItem(key,'1');
   document.getElementById('splashScreen').classList.remove('active');
 }
 function openGuideModal(){document.getElementById('guideModal').classList.add('open');document.body.style.overflow='hidden';}
