@@ -696,12 +696,15 @@ function setCurrency(c){
 
 /* ══ LOGIN ══ */
 function onPinInput(inp){const v=inp.value;for(let i=1;i<=4;i++)document.getElementById('d'+i).classList.toggle('filled',v.length>=i);}
-function doLogin(){
+async function doLogin(){
   const name=document.getElementById('nameInput').value.trim();
   const pin=document.getElementById('pinInput').value.trim();
   if(!name||!pin){document.getElementById('loginError').textContent='Ism va PIN kiriting';return;}
-  const clients=getClients();
-  const c=clients.find(x=>x.name.toLowerCase().includes(name.toLowerCase())&&x.pin===pin);
+  const btn=document.querySelector('.login-btn');
+  btn.textContent='Tekshirilmoqda...';btn.disabled=true;
+  document.getElementById('loginError').textContent='';
+  const c=await loadClientData(name,pin);
+  btn.textContent='KIRISH';btn.disabled=false;
   if(!c){document.getElementById('loginError').textContent='Ism yoki PIN noto\'g\'ri';return;}
   currentClient=c;
   document.getElementById('loginScreen').classList.remove('active');
