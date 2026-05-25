@@ -1082,15 +1082,20 @@ function openModal(cid,sec,type){
 
 function renderModalBody(c,sec,type,data){
   const{avS,tolS,hisobS,jami,qoldiq,pct}=calcSec(data);
+  const isMat=sec==='material';
   if(type==='hisob'){
     const rows=data.hisob.length?data.hisob.map(h=>{
-      const total=h.m2*h.price;
+      // Material: qty+unit, Tamirlash: m²+narx
+      const total=isMat?(h.qty*(h.price||0)):(h.m2*h.price);
+      const detailText=isMat
+        ?`${h.qty||0} ${h.unit||'dona'} × ${(h.price||0).toLocaleString()} so'm`
+        :`${h.m2} m² × ${h.price.toLocaleString()} so'm/m²${h.totalUSD?' · $'+h.totalUSD:''}`;
       return `
       <div style="background:var(--cream);border-radius:10px;border:1px solid var(--cream3);margin-bottom:6px;overflow:hidden;">
         <div id="hview-${h.id}" style="display:flex;align-items:center;padding:12px 13px;gap:10px;">
           <div style="flex:1;min-width:0;">
             <div style="font-size:13px;font-weight:500;color:var(--dark);">${h.name}</div>
-            <div style="font-size:11px;color:var(--text-light);margin-top:2px;">${h.m2} m² × ${h.price.toLocaleString()} so'm/m²${h.totalUSD?' · $'+h.totalUSD:''}</div>
+            <div style="font-size:11px;color:var(--text-light);margin-top:2px;">${detailText}</div>
           </div>
           <div style="text-align:right;flex-shrink:0;">
             <div style="font-family:'Cormorant Garamond',serif;font-size:15px;font-weight:700;color:var(--bronze);">${fmt(total)}</div>
@@ -1103,15 +1108,31 @@ function renderModalBody(c,sec,type,data){
         </div>
         <div id="hedit-${h.id}" style="display:none;padding:12px 13px;border-top:1px solid var(--cream3);background:var(--white);">
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px;">
-            <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:5px;">Ish nomi</div>
+            <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:5px;">Nomi</div>
               <input class="if-input" type="text" id="he-name-${h.id}" value="${h.name}" style="width:100%"></div>
+            ${isMat?`
+            <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:5px;">Miqdor</div>
+              <input class="if-input" type="number" id="he-m2-${h.id}" value="${h.qty||0}" style="width:100%"></div>
+            `:`
             <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:5px;">m²</div>
               <input class="if-input" type="number" id="he-m2-${h.id}" value="${h.m2}" style="width:100%"></div>
+            `}
           </div>
           <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px;">
-            <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:5px;">Narx (so'm/m²)</div>
-              <input class="if-input" type="number" id="he-price-${h.id}" value="${h.price}" style="width:100%"></div>
-            <div></div>
+            <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:5px;">${isMat?'Narx (so\'m/dona)':'Narx (so\'m/m²)'}</div>
+              <input class="if-input" type="number" id="he-price-${h.id}" value="${h.price||0}" style="width:100%"></div>
+            ${isMat?`
+            <div><div style="font-size:9px;letter-spacing:1.5px;text-transform:uppercase;color:var(--text-light);margin-bottom:5px;">Birlik</div>
+              <select class="if-input" id="he-unit-${h.id}" style="width:100%;background:var(--white);">
+                <option ${(h.unit||'dona')==='dona'?'selected':''}>dona</option>
+                <option ${h.unit==='kg'?'selected':''}>kg</option>
+                <option ${h.unit==='l'?'selected':''}>l</option>
+                <option ${h.unit==='m²'?'selected':''}>m²</option>
+                <option ${h.unit==='m'?'selected':''}>m</option>
+                <option ${h.unit==='qop'?'selected':''}>qop</option>
+                <option ${h.unit==="to'plam"?'selected':''}>to'plam</option>
+              </select></div>
+            `:'<div></div>'}
           </div>
           <div style="display:flex;gap:7px;justify-content:flex-end;">
             <button class="if-cancel" onclick="editHisobClose('${h.id}')">Bekor</button>
@@ -1119,9 +1140,28 @@ function renderModalBody(c,sec,type,data){
           </div>
         </div>
       </div>`}).join(''):'<div class="empty-sm">Hisob-kitob kiritilmagan</div>';
-    return `
-      <div class="m-sec-title">Jami: ${fmt(hisobS)} <span style="opacity:.6;font-weight:300">≈ $${Math.round(hisobS/USD_RATE).toLocaleString()}</span></div>
-      ${rows}
+
+    // Add form — material uchun alohida, tamirlash uchun alohida
+    const addFormHtml=isMat?`
+      <div class="inline-form" id="hisob-form">
+        <div class="if-g">
+          <input class="if-input" type="text" id="hf-name" placeholder="Material nomi (Gips, Bo'yoq...)">
+          <input class="if-input" type="number" id="hf-m2" placeholder="Miqdor">
+        </div>
+        <div class="if-g">
+          <input class="if-input" type="number" id="hf-price" placeholder="Narx (so'm)">
+          <select class="if-input" id="hf-unit" style="background:var(--cream);">
+            <option>dona</option><option>kg</option><option>l</option>
+            <option>m²</option><option>m</option><option>qop</option><option>to'plam</option>
+          </select>
+        </div>
+        <div class="if-actions">
+          <button class="if-cancel" onclick="toggleIF('hisob-form')">Bekor</button>
+          <button class="if-save" onclick="addHisob()">Saqlash</button>
+        </div>
+      </div>
+      <button class="add-row-btn" onclick="toggleIF('hisob-form')">＋ Material qo'shish</button>`
+    :`
       <div class="inline-form" id="hisob-form">
         <div class="if-g">
           <input class="if-input" type="text" id="hf-name" placeholder="Ish nomi">
@@ -1136,7 +1176,12 @@ function renderModalBody(c,sec,type,data){
           <button class="if-save" onclick="addHisob()">Saqlash</button>
         </div>
       </div>
-      <button class="add-row-btn" onclick="toggleIF('hisob-form')">＋ Ish qo'shish</button>
+      <button class="add-row-btn" onclick="toggleIF('hisob-form')">＋ Ish qo'shish</button>`;
+
+    return `
+      <div class="m-sec-title">Jami: ${fmt(hisobS)} <span style="opacity:.6;font-weight:300">≈ $${Math.round(hisobS/USD_RATE).toLocaleString()}</span></div>
+      ${rows}
+      ${addFormHtml}
       <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--cream2);">
         <div class="m-sec-title" style="margin-bottom:10px;">Jami summani yangilash</div>
         <div style="display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;margin-bottom:8px;">
@@ -1243,7 +1288,12 @@ function saveHisobEdit(cid,sec,hid){
   const m2=parseFloat(document.getElementById('he-m2-'+hid).value)||0;
   const price=parseFloat(document.getElementById('he-price-'+hid).value)||0;
   if(!name||!m2||!price){toast('❗ Barcha maydonlarni to\'ldiring');return;}
-  h.name=name;h.m2=m2;h.price=price;
+  if(sec==='material'){
+    const unitEl=document.getElementById('he-unit-'+hid);
+    h.name=name;h.qty=m2;h.price=price;h.unit=unitEl?unitEl.value:'dona';
+  } else {
+    h.name=name;h.m2=m2;h.price=price;
+  }
   saveData();openModal(cid,sec,'hisob');toast('✅ Tahrirlandi');
 }
 function addHisob(){
@@ -1254,8 +1304,16 @@ function addHisob(){
   const m2=parseFloat(document.getElementById('hf-m2').value)||0;
   const price=parseFloat(document.getElementById('hf-price').value)||0;
   if(!name||!m2||!price){toast('❗ Barcha maydonlarni to\'ldiring');return;}
-  c[sec].hisob.push({id:uid(),name,m2,price});
-  saveData();openModal(cid,sec,'hisob');toast('✅ Ish qo\'shildi');
+  if(sec==='material'){
+    const unit=document.getElementById('hf-unit')?.value||'dona';
+    c[sec].hisob.push({id:uid(),name,qty:m2,price,unit});
+    // Auto jami yangilash
+    const sum=c[sec].hisob.reduce((a,h)=>a+(h.qty*(h.price||0)),0);
+    if(sum>0) c[sec].jami=sum;
+  } else {
+    c[sec].hisob.push({id:uid(),name,m2,price});
+  }
+  saveData();openModal(cid,sec,'hisob');toast('✅ Qo\'shildi');
 }
 function updateJami(){
   if(!modalCtx) return;
