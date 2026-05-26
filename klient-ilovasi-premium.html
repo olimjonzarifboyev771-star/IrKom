@@ -1124,8 +1124,7 @@ async function sendClientMsg(){
   const months=currentLang==='ru'?['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']:['Yan','Feb','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
   const dateStr=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear()+', '+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
 
-  let fileData=null;
-  let fileName=null;
+  let fileData=null,fileName=null;
   if(selectedFile){
     try{
       fileData=await new Promise((res,rej)=>{
@@ -1135,12 +1134,12 @@ async function sendClientMsg(){
         r.readAsDataURL(selectedFile);
       });
       fileName=selectedFile.name;
-    }catch(e){}
+    }catch(e){fileData=null;}
   }
 
   const msg={
     id:'cm'+Date.now(),
-    text:text||(currentLang==='ru'?'Файл отправлен':'Fayl yuborildi'),
+    text:text||(fileName?(currentLang==='ru'?'Файл отправлен':'Fayl yuborildi'):''),
     date:dateStr,
     from:'client',
     read:false,
@@ -1151,12 +1150,32 @@ async function sendClientMsg(){
   if(!currentClient.clientMessages) currentClient.clientMessages=[];
   currentClient.clientMessages.push(msg);
 
+  // Avval localStorage ga saqlash
   try{
-    await sbSet('clients',currentClient.id,currentClient);
-    localStorage.setItem('irkom_v3',JSON.stringify(getClients().map(x=>x.id===currentClient.id?currentClient:x)));
-    toast(currentLang==='ru'?'✅ Сообщение отправлено!':'✅ Xabar yuborildi!');
+    const all=getClients();
+    const idx=all.findIndex(x=>x.id===currentClient.id);
+    if(idx>-1) all[idx]=currentClient;
+    else all.push(currentClient);
+    localStorage.setItem('irkom_v3',JSON.stringify(all));
+  }catch(e){}
+
+  // Supabase ga yuborish
+  try{
+    const resp=await fetch(`${SB_URL}/rest/v1/clients`,{
+      method:'POST',
+      headers:{...SB_H,'Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({id:currentClient.id,data:currentClient,updated_at:new Date().toISOString()})
+    });
+    if(!resp.ok){
+      const err=await resp.text();
+      console.error('Supabase error:',resp.status,err);
+      toast(currentLang==='ru'?'⚠️ Ошибка сервера: '+resp.status:'⚠️ Server xatosi: '+resp.status);
+    } else {
+      toast(currentLang==='ru'?'✅ Сообщение отправлено!':'✅ Xabar yuborildi!');
+    }
   }catch(e){
-    toast(currentLang==='ru'?'⚠️ Ошибка отправки':'⚠️ Xatolik yuz berdi');
+    console.error('Network error:',e);
+    toast(currentLang==='ru'?'⚠️ Интернет ошибка':'⚠️ Internet xatosi');
   }
 
   document.getElementById('clientMsgText').value='';
