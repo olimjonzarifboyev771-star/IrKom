@@ -968,6 +968,7 @@ function renderCard(c){
       ${renderMiniPanel(c,'material')}
       <div class="client-actions">
         <button class="ca-btn" onclick="openMsgModal('${c.id}')">💬 Xabar</button>
+        <button class="ca-btn" onclick="openEditClient('${c.id}')">✏️ Tahrirlash</button>
         <button class="ca-btn" onclick="openStatusModal('${c.id}')">📍 Holat</button>
         <button class="ca-btn danger" onclick="deleteClient('${c.id}')">🗑 O'chirish</button>
       </div>
@@ -1042,6 +1043,63 @@ function miniTab(cid,tab,btn){
 }
 
 /* ══ STATUS MODAL ══ */
+function openEditClient(cid){
+  const c=clients.find(x=>x.id===cid);
+  if(!c) return;
+  document.getElementById('modalTitle').textContent=c.name+' — Tahrirlash';
+  document.getElementById('modalBody').innerHTML=`
+    <div class="fg">
+      <div class="fgg"><div class="fl">Ism *</div><input class="fi" id="ec-name" type="text" value="${c.name||''}"></div>
+      <div class="fgg"><div class="fl">PIN (4 raqam)</div><input class="fi" id="ec-pin" type="text" value="${c.pin||''}" maxlength="4"></div>
+    </div>
+    <div class="fg">
+      <div class="fgg"><div class="fl">Loyiha nomi</div><input class="fi" id="ec-project" type="text" value="${c.project||''}"></div>
+      <div class="fgg"><div class="fl">Telefon</div><input class="fi" id="ec-phone" type="tel" value="${c.phone||''}"></div>
+    </div>
+    <div class="fg">
+      <div class="fgg"><div class="fl">Loyiha holati</div>
+        <select class="fi" id="ec-status">
+          <option value="active" ${c.status==='active'?'selected':''}>🔨 Faol</option>
+          <option value="done" ${c.status==='done'?'selected':''}>✅ Tugallangan</option>
+          <option value="pause" ${c.status==='pause'?'selected':''}>⏸ To'xtatilgan</option>
+        </select>
+      </div>
+      <div class="fgg"><div class="fl">Boshlanish sanasi</div><input class="fi" id="ec-startdate" type="date" value="${c.startDate||''}"></div>
+    </div>
+    <div class="fg">
+      <div class="fgg"><div class="fl">Tamirlash jami ($)</div><input class="fi" id="ec-tamir" type="number" value="${c.tamir?.jami?Math.round(c.tamir.jami/USD_RATE):''}"></div>
+      <div class="fgg"><div class="fl">Material jami ($)</div><input class="fi" id="ec-material" type="number" value="${c.material?.jami?Math.round(c.material.jami/USD_RATE):''}"></div>
+    </div>
+    <div class="form-actions">
+      <button class="btn-cancel2" onclick="closeModal()">Bekor</button>
+      <button class="btn-save" onclick="saveEditClient('${cid}')">✓ Saqlash</button>
+    </div>`;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+
+function saveEditClient(cid){
+  const c=clients.find(x=>x.id===cid);
+  if(!c) return;
+  const name=document.getElementById('ec-name').value.trim();
+  const pin=document.getElementById('ec-pin').value.trim();
+  if(!name){toast('❗ Ismni kiriting');return;}
+  if(pin&&pin.length!==4){toast('❗ PIN 4 raqam bo\'lishi kerak');return;}
+  c.name=name;
+  if(pin) c.pin=pin;
+  c.project=document.getElementById('ec-project').value.trim();
+  c.phone=document.getElementById('ec-phone').value.trim();
+  c.status=document.getElementById('ec-status').value;
+  c.startDate=document.getElementById('ec-startdate').value;
+  const tamir=parseFloat(document.getElementById('ec-tamir').value)||0;
+  const mat=parseFloat(document.getElementById('ec-material').value)||0;
+  if(tamir>0) c.tamir.jami=Math.round(tamir*USD_RATE);
+  if(mat>0) c.material.jami=Math.round(mat*USD_RATE);
+  saveData();
+  closeModal();
+  toast('✅ Klient ma\'lumotlari yangilandi!');
+}
+
 function openStatusModal(cid){
   const c=clients.find(x=>x.id===cid);
   if(!c) return;
