@@ -1467,7 +1467,8 @@ function openMsgModal(cid){
   const c=clients.find(x=>x.id===cid);
   if(!c) return;
   if(!c.messages) c.messages=[];
-  document.getElementById('msgModalTitle').textContent=c.name+' — Xabar yuborish';
+  document.getElementById('msgModalTitle').textContent=c.name+' — Xabarlar';
+  const clientMsgs=c.clientMessages||[];
   const msgs=c.messages;
   document.getElementById('msgModalBody').innerHTML=`
     <div style="margin-bottom:12px;">
@@ -1477,6 +1478,13 @@ function openMsgModal(cid){
       </div>
     </div>
     <textarea class="msg-textarea" id="msgText" placeholder="Xabar matni..."></textarea>
+    <div style="margin-top:8px;display:flex;align-items:center;gap:8px;">
+      <label style="display:flex;align-items:center;gap:5px;padding:8px 12px;background:var(--cream);border:1px solid var(--cream3);border-radius:9px;font-size:12px;color:var(--text-mid);cursor:pointer;">
+        📎 Fayl/rasm
+        <input type="file" id="adminFileInput" style="display:none" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="onAdminFileSelect(this)">
+      </label>
+      <div id="adminFilePreview" style="font-size:11px;color:var(--bronze);"></div>
+    </div>
     <div class="msg-channels">
       <div class="msg-ch selected" id="ch-sms" onclick="selectCh('sms')">
         <div class="msg-ch-icon">📱</div>
@@ -1492,38 +1500,45 @@ function openMsgModal(cid){
       </div>
     </div>
     <button class="msg-send-btn" onclick="sendMsg('${cid}')">📤 Yuborish</button>
-    ${msgs.length?`
+    ${(msgs.length||clientMsgs.length)?`
     <div class="msg-history">
-      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin:14px 0 10px;">Yuborilgan xabarlar</div>
-      ${[...msgs].reverse().map(m=>`
-      <div class="msg-item">
-        <div class="msg-item-text">${m.text}</div>
-        <div class="msg-item-meta"><span>${m.channel||'sms'}</span><span>${m.date}</span></div>
-      </div>`).join('')}
-    </div>`:''
-  }`;
+      <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin:14px 0 10px;">Xabarlar tarixi</div>
+      ${[...msgs.map(m=>({...m,dir:'admin'})),...clientMsgs.map(m=>({...m,dir:'client'}))].sort((a,b)=>a.id>b.id?-1:1).map(m=>{
+        const isClient=m.dir==='client';
+        return `<div class="msg-item" style="border-left:3px solid ${isClient?'#5A7A9A':'var(--bronze)'};">
+          <div style="font-size:10px;font-weight:600;color:${isClient?'#5A7A9A':'var(--bronze)'};margin-bottom:3px;">${isClient?'👤 Klient':'👨‍💼 Admin'}</div>
+          <div class="msg-item-text">${m.text}</div>
+          ${m.file?`<div style="margin-top:4px;"><a href="${m.file}" target="_blank" style="font-size:11px;color:var(--sand);text-decoration:none;">📎 ${m.fileName||'Fayl'}</a></div>`:''}
+          <div class="msg-item-meta"><span>${m.channel||''}</span><span>${m.date}</span></div>
+        </div>`;
+      }).join('')}
+    </div>`:''}
+  `;
   document.getElementById('msgModalOverlay').classList.add('open');
   document.body.style.overflow='hidden';
 }
 
-let selectedChannel='sms';
-function selectCh(ch){
-  selectedChannel=ch;
-  ['sms','telegram','call'].forEach(c=>document.getElementById('ch-'+c).classList.toggle('selected',c===ch));
-}
+let selectedChannel='sms',adminSelectedFile=null;
+function selectCh(ch){selectedChannel=ch;['sms','telegram','call'].forEach(c=>document.getElementById('ch-'+c).classList.toggle('selected',c===ch));}
 function setMsgText(t){const el=document.getElementById('msgText');if(el)el.value=t;}
-function sendMsg(cid){
+function onAdminFileSelect(input){const file=input.files[0];if(!file)return;adminSelectedFile=file;const p=document.getElementById('adminFilePreview');if(p)p.textContent='📎 '+file.name;}
+async function sendMsg(cid){
   const c=clients.find(x=>x.id===cid);
   if(!c) return;
   if(!c.messages) c.messages=[];
   const text=document.getElementById('msgText').value.trim();
-  if(!text){toast('❗ Xabar matni kiriting');return;}
+  if(!text&&!adminSelectedFile){toast('❗ Xabar matni kiriting');return;}
   const now=new Date();
-  const dateStr=now.getDate()+' '+['Yan','Feb','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'][now.getMonth()]+' '+now.getFullYear();
-  c.messages.push({id:uid(),text,date:dateStr,channel:selectedChannel});
-  saveData();
-  openMsgModal(cid);
-  toast('✅ Xabar saqlandi');
+  const months=['Yan','Feb','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+  const dateStr=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear()+', '+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+  let fileData=null,fileName=null;
+  if(adminSelectedFile){
+    try{fileData=await new Promise((res,rej)=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.onerror=()=>rej();r.readAsDataURL(adminSelectedFile);});fileName=adminSelectedFile.name;}catch(e){}
+  }
+  c.messages.push({id:uid(),text:text||(fileName?'Fayl yuborildi':''),date:dateStr,channel:selectedChannel,file:fileData||null,fileName:fileName||null});
+  adminSelectedFile=null;
+  const inp=document.getElementById('adminFileInput');if(inp)inp.value='';
+  saveData();openMsgModal(cid);toast('✅ Xabar yuborildi!');
 }
 function closeMsgModal(){document.getElementById('msgModalOverlay').classList.remove('open');document.body.style.overflow='';}
 
