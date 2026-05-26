@@ -422,7 +422,12 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
     <div class="topbar-logo">IK</div>
     <div class="topbar-title">IrKom</div>
   </div>
-  <div class="admin-badge">Admin</div>
+  <div style="display:flex;align-items:center;gap:8px;">
+    <button onclick="changeAdminPhone()" style="background:rgba(201,185,154,.1);border:1px solid rgba(201,185,154,.2);color:var(--sand);font-size:11px;padding:5px 10px;border-radius:8px;cursor:pointer;font-family:'Jost',sans-serif;display:flex;align-items:center;gap:5px;" title="Telefon raqamni o'zgartirish">
+      📞 <span id="adminPhoneDisplay">+998909094443</span>
+    </button>
+    <div class="admin-badge">Admin</div>
+  </div>
 </div>
 
 <div class="nav-tabs">
@@ -704,6 +709,7 @@ async function sbDel(table,id){
 
 /* ══ STATE ══ */
 let USD_RATE=12800,currency='usd',clients=[],modalCtx=null,searchQuery='',activeFilter='all',selected={};
+let ADMIN_PHONE=localStorage.getItem('irkom_admin_phone')||'+998909094443';
 
 function showLoading(show){
   let el=document.getElementById('ldOv');
@@ -1540,11 +1546,7 @@ function openMsgModal(cid){
         <div class="msg-ch-icon">📱</div>
         <div class="msg-ch-label">SMS</div>
       </div>
-      <div class="msg-ch" id="ch-telegram" onclick="selectCh('telegram')">
-        <div class="msg-ch-icon">✈️</div>
-        <div class="msg-ch-label">Telegram</div>
-      </div>
-      <div class="msg-ch" id="ch-call" onclick="selectCh('call')">
+      <div class="msg-ch" id="ch-call" onclick="selectCh('call','${cid}')">
         <div class="msg-ch-icon">📞</div>
         <div class="msg-ch-label">Qo'ng'iroq</div>
       </div>
@@ -1569,7 +1571,18 @@ function openMsgModal(cid){
 }
 
 let selectedChannel='sms',adminSelectedFile=null;
-function selectCh(ch){selectedChannel=ch;['sms','telegram','call'].forEach(c=>document.getElementById('ch-'+c).classList.toggle('selected',c===ch));}
+function selectCh(ch,cid){
+  selectedChannel=ch;
+  ['sms','call'].forEach(id=>{const el=document.getElementById('ch-'+id);if(el)el.classList.toggle('selected',id===ch);});
+  if(ch==='call'&&cid){
+    const client=clients.find(x=>x.id===cid);
+    if(client&&client.phone){
+      window.location.href='tel:'+client.phone;
+    } else {
+      toast('❗ Klient telefon raqami kiritilmagan');
+    }
+  }
+}
 function setMsgText(t){const el=document.getElementById('msgText');if(el)el.value=t;}
 function onAdminFileSelect(input){const file=input.files[0];if(!file)return;adminSelectedFile=file;const p=document.getElementById('adminFilePreview');if(p)p.textContent='📎 '+file.name;}
 async function sendMsg(cid){
@@ -2251,9 +2264,38 @@ function saveToClient(){
 /* ══ TOAST ══ */
 function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2500);}
 
+function changeAdminPhone(){
+  const current=ADMIN_PHONE;
+  const newPhone=prompt('Admin telefon raqami:\n(Klientlar shu raqamga qo\'ng\'iroq qiladi)',current);
+  if(newPhone&&newPhone.trim()){
+    ADMIN_PHONE=newPhone.trim();
+    localStorage.setItem('irkom_admin_phone',ADMIN_PHONE);
+    const el=document.getElementById('adminPhoneDisplay');
+    if(el) el.textContent=ADMIN_PHONE;
+    // Supabase ga ham saqlash
+    sbSet('catalog','admin_settings',{phone:ADMIN_PHONE}).catch(()=>{});
+    toast('✅ Telefon raqam saqlandi: '+ADMIN_PHONE);
+  }
+}
+
+function initAdminPhone(){
+  // Supabase dan telefon raqamni yuklash
+  fetch(`${SB_URL}/rest/v1/catalog?id=eq.admin_settings&select=data`,{headers:SB_H})
+    .then(r=>r.json())
+    .then(rows=>{
+      if(rows&&rows[0]&&rows[0].data&&rows[0].data.phone){
+        ADMIN_PHONE=rows[0].data.phone;
+        localStorage.setItem('irkom_admin_phone',ADMIN_PHONE);
+        const el=document.getElementById('adminPhoneDisplay');
+        if(el) el.textContent=ADMIN_PHONE;
+      }
+    }).catch(()=>{});
+}
+
 /* ══ INIT ══ */
 loadClients();
 loadKurs();
+initAdminPhone();
 </script>
 </body>
 </html>

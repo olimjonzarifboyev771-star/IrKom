@@ -519,9 +519,12 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
 
       <!-- XABAR YUBORISH -->
       <div style="background:var(--white);border:1px solid var(--cream3);border-radius:var(--r2);padding:16px;margin-bottom:16px;">
+        <!-- Qo'ng'iroq tugmasi -->
+        <a id="call-admin-btn" href="tel:+998909094443" style="display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:12px;background:linear-gradient(135deg,#2A5A2A,#3A7A3A);border:none;border-radius:11px;font-family:'Jost',sans-serif;font-size:13px;font-weight:500;letter-spacing:1px;text-transform:uppercase;color:#fff;text-decoration:none;margin-bottom:10px;">
+          📞 <span id="call-btn-label">Qo'ng'iroq qilish</span>
+        </a>
         <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:10px;" id="send-msg-label">Xabar yuborish</div>
         <textarea id="clientMsgText" style="width:100%;background:var(--cream);border:1.5px solid var(--cream3);border-radius:12px;padding:12px 14px;font-family:'Jost',sans-serif;font-size:14px;color:var(--text-dark);outline:none;resize:none;height:80px;transition:border-color .2s;line-height:1.6;" placeholder="Xabar yozing..."></textarea>
-
         <button onclick="sendClientMsg()" style="width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,var(--bronze),#C49A60);border:none;border-radius:11px;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--dark);cursor:pointer;" id="send-btn">📤 Yuborish</button>
       </div>
 
@@ -695,6 +698,8 @@ function applyLang(){
   const matTitle=document.getElementById('mat-title-text');
   if(matTitle) matTitle.textContent=ru?'Список материалов':'Materiallar ro\'yxati';
   // Bildirishnomalar
+  const cb=document.getElementById('call-btn-label');
+  if(cb) cb.textContent=currentLang==='ru'?'Позвонить нам':'Qo\'ng\'iroq qilish';
   const sml=document.getElementById('send-msg-label');
   if(sml) sml.textContent=t('sendMsg');
   const al=document.getElementById('attach-label');
@@ -720,6 +725,21 @@ function applyLang(){
 }
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhta2NpbmJoZW1mYXlxaXVnZ2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjE2MDUsImV4cCI6MjA5NTI5NzYwNX0.NkmPGWtHwJKfR5K90lRAFmRqdFJ9XMri64Kg9TYnECU';
 const SB_H={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
+let ADMIN_PHONE=localStorage.getItem('irkom_admin_phone')||'+998909094443';
+
+async function loadAdminPhone(){
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/catalog?id=eq.admin_settings&select=data`,{headers:SB_H});
+    const rows=await r.json();
+    if(rows&&rows[0]&&rows[0].data&&rows[0].data.phone){
+      ADMIN_PHONE=rows[0].data.phone;
+      localStorage.setItem('irkom_admin_phone',ADMIN_PHONE);
+    }
+  }catch(e){}
+  const btn=document.getElementById('call-admin-btn');
+  if(btn) btn.href='tel:'+ADMIN_PHONE;
+}
+
 
 async function sbSet(table,id,data){
   try{
@@ -917,7 +937,10 @@ function initDash(){
   loadKurs();
   renderServicesList();
   applyLang();
-  // Yangi xabarlarni tekshirish (har 15 sekund)
+  loadAdminPhone();
+  // Darhol tekshir
+  pollAdminMessages();
+  // Har 15 sekund yangilash
   if(window._pollInterval) clearInterval(window._pollInterval);
   window._pollInterval=setInterval(pollAdminMessages,15000);
 }
@@ -996,20 +1019,30 @@ function updateBadge(){
 async function pollAdminMessages(){
   if(!currentClient) return;
   try{
-    const r=await fetch(`${SB_URL}/rest/v1/clients?id=eq.${currentClient.id}&select=data`,{headers:SB_H});
+    const r=await fetch(`${SB_URL}/rest/v1/clients?id=eq.${encodeURIComponent(currentClient.id)}&select=data`,{headers:SB_H});
     const rows=await r.json();
     if(!rows||!rows[0]||!rows[0].data) return;
     const fresh=rows[0].data;
-    const oldCount=(currentClient.messages||[]).length;
-    const newCount=(fresh.messages||[]).length;
-    if(newCount>oldCount){
-      // Yangi xabar keldi!
-      currentClient.messages=fresh.messages;
-      const unread=(fresh.messages||[]).filter(m=>!m.read).length;
+    const oldMsgs=(currentClient.messages||[]);
+    const newMsgs=(fresh.messages||[]);
+    const oldClientMsgs=(currentClient.clientMessages||[]);
+    const newClientMsgs=(fresh.clientMessages||[]);
+    // Admin xabarlari ko'payganmi?
+    const hasNewAdmin=newMsgs.length>oldMsgs.length;
+    // Klient xabarlari serverda saqlangmi?
+    const hasNewClient=newClientMsgs.length>oldClientMsgs.length;
+    if(hasNewAdmin||hasNewClient){
+      // currentClient ni to'liq yangilash
+      currentClient.messages=newMsgs;
+      currentClient.clientMessages=newClientMsgs;
+      // Unread hisobi
+      const unread=newMsgs.filter(m=>!m.read).length;
       updateBadge();
-      // Bildirishnoma sahifasida bo'lsa yangilasin
+      // Xabarlar sahifasi ochiq bo'lsa — yangilasin
       const notifPage=document.getElementById('pg-notiflar');
-      if(notifPage&&notifPage.classList.contains('active')) renderNotifs();
+      if(notifPage&&notifPage.classList.contains('active')){
+        renderNotifs();
+      }
     }
   }catch(e){}
 }
