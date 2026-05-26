@@ -983,10 +983,13 @@ function markAllRead(){
   updateBadge();
 }
 function updateBadge(){
-  const c=currentClient;
-  const msgs=(c.messages||[]).filter(m=>!m.read).length;
+  if(!currentClient) return;
+  const unread=(currentClient.messages||[]).filter(m=>!m.read).length;
   const badge=document.getElementById('notifBadge');
-  if(badge){badge.textContent=msgs;badge.style.display=msgs>0?'flex':'none';}
+  if(badge){
+    badge.textContent=unread;
+    badge.style.display=unread>0?'flex':'none';
+  }
 }
 
 // Har 15 soniyada admin xabarlarini tekshirish
@@ -1012,32 +1015,44 @@ async function pollAdminMessages(){
 }
 function renderNotifs(){
   const c=currentClient;
-  const msgs=c.messages||[];
-  // Barcha xabarlarni o'qilgan deb belgilash
-  markAllRead();
+  const adminMsgs=(c.messages||[]).map(m=>({...m,from:'admin'}));
+  const clientMsgs2=(c.clientMessages||[]).map(m=>({...m,from:'client'}));
+  const all=[...adminMsgs,...clientMsgs2].sort((a,b)=>a.id>b.id?1:-1);
   const lang=currentLang;
-  const sysNotifs=[
-    {icon:'🏗️',title:lang==='ru'?'Статус проекта':'Loyiha holati',
-     text:c.status==='done'?(lang==='ru'?'Ваш проект успешно завершён!':'Loyihangiz muvaffaqiyatli yakunlandi!'):(lang==='ru'?'Проект в процессе работы.':'Loyiha ish jarayonida.'),date:lang==='ru'?'Сегодня':'Bugun',unread:false},
-  ];
-  const all=[...msgs.map(m=>({...m,icon:'💬',title:lang==='ru'?'Сообщение от администратора':'Admin xabari',unread:false})),...sysNotifs];
   const sub=document.getElementById('notif-sub');
-  if(sub) sub.textContent=msgs.length+(lang==='ru'?' сообщений':' ta xabar');
-  
-  document.getElementById('notifsList').innerHTML=all.length?all.map(n=>`
-    <div class="notif-item read">
-      <div class="ni-icon">${n.icon}</div>
-      <div style="flex:1">
-        <div class="ni-title">${n.title}</div>
-        <div class="ni-text">${n.text}</div>
-        ${n.file?`<div style="margin-top:6px"><a href="${n.file}" target="_blank" style="font-size:11px;color:var(--sand);text-decoration:none;">📎 ${n.fileName||'Fayl'}</a></div>`:''}
-        <div class="ni-time">${n.date}</div>
-      </div>
-    </div>`).join(''):'<div style="text-align:center;padding:40px;color:var(--text-light)"><div style="font-size:36px;margin-bottom:10px">🔔</div>'+(lang==='ru'?'Нет сообщений':'Hali xabar yo\'q')+'</div>';
-  
-  // Klient xabar yuborish formasi
-  const sendForm=document.getElementById('clientMsgForm');
-  if(!sendForm) return;
+  if(sub) sub.textContent=all.length+(lang==='ru'?' сообщений':' ta xabar');
+  if(!all.length){
+    document.getElementById('notifsList').innerHTML=`
+      <div class="chat-empty">
+        <div class="ce-icon">💬</div>
+        <div style="font-size:14px;color:var(--text-mid);margin-bottom:6px;">${lang==='ru'?'Нет сообщений':"Hali xabar yo'q"}</div>
+        <div style="font-size:12px;">${lang==='ru'?'Напишите нам ниже':'Quyida xabar yozing'}</div>
+      </div>`;
+    updateBadge();
+    return;
+  }
+  document.getElementById('notifsList').innerHTML=`<div class="chat-wrap">${all.map(m=>{
+    const isClient=m.from==='client';
+    const senderLabel=isClient?(lang==='ru'?'Вы':'Siz'):(lang==='ru'?'Администратор':'Admin');
+    return `<div class="chat-msg ${isClient?'client':'admin'}">
+      <div class="chat-sender">${senderLabel}</div>
+      <div class="chat-bubble">${m.text}</div>
+      <div class="chat-meta">🕐 ${m.date||''}</div>
+    </div>`;
+  }).join('')}</div>`;
+  // Admin xabarlarini o'qilgan deb belgilash
+  let changed=false;
+  (c.messages||[]).forEach(m=>{if(!m.read){m.read=true;changed=true;}});
+  if(changed){
+    sbSet('clients',c.id,c).then(()=>{}).catch(()=>{});
+    try{
+      const all2=getClients();
+      const idx=all2.findIndex(x=>x.id===c.id);
+      if(idx>-1) all2[idx]=c;
+      localStorage.setItem('irkom_v3',JSON.stringify(all2));
+    }catch(e){}
+  }
+  updateBadge();
 }
 
 /* ══ TABS & PAGES ══ */
@@ -1057,7 +1072,7 @@ function switchPage(name,btn){
   if(name==='notiflar'){renderNotifs();markAllRead();updateBadge();}
 }
 
-/* ══ MODAL ══ */
+
 function openModal(sec,type){
   const c=currentClient;
   const data=c[sec];
