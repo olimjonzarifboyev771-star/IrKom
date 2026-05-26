@@ -285,52 +285,24 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
 <!-- ══ SPLASH SCREEN (birinchi kirish) ══ -->
 <div id="splashScreen">
   <div class="splash-inner">
+    <!-- Til tanlash (splash ichida) -->
+    <div style="display:flex;justify-content:center;gap:6px;margin-bottom:24px;">
+      <button id="splash-lang-uz" onclick="setLangSplash('uz')" style="padding:6px 16px;border:1.5px solid rgba(160,120,80,.8);border-radius:99px;background:rgba(160,120,80,.9);color:#1C1510;font-family:'Jost',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;">🇺🇿 UZ</button>
+      <button id="splash-lang-ru" onclick="setLangSplash('ru')" style="padding:6px 16px;border:1.5px solid rgba(201,185,154,.2);border-radius:99px;background:transparent;color:rgba(201,185,154,.45);font-family:'Jost',sans-serif;font-size:11px;font-weight:700;cursor:pointer;letter-spacing:1px;">🇷🇺 RU</button>
+    </div>
     <div class="splash-logo">
       <div class="splash-monogram">IK</div>
       <div class="splash-brand">IRKOM</div>
-      <div class="splash-tagline">Premium ta'mirlash xizmati</div>
+      <div class="splash-tagline" id="splash-tagline">Premium ta'mirlash xizmati</div>
     </div>
-
     <div class="splash-welcome">
-      <h2>Xush kelibsiz, hurmatli mijoz!</h2>
-      <p>Ushbu ilova sizning vaqtingizni tejash hamda xizmat jarayonini to'liq kuzatib borish maqsadida maxsus tayyorlangan. Bizni tanlaganingiz uchun rahmat!</p>
+      <h2 id="splash-welcome-title">Xush kelibsiz, hurmatli mijoz!</h2>
+      <p id="splash-welcome-text">Ushbu ilova sizning vaqtingizni tejash hamda xizmat jarayonini to'liq kuzatib borish maqsadida maxsus tayyorlangan. Bizni tanlaganingiz uchun rahmat!</p>
     </div>
-
     <div class="splash-divider"></div>
-
-    <div class="guide-list">
-      <div class="guide-item">
-        <div class="gi-icon">🏠</div>
-        <div class="gi-content">
-          <div class="gi-title">Asosiy — moliyaviy holat</div>
-          <div class="gi-desc">Tamirlash va material bo'yicha umumiy summa, to'langan, avans, qoldiq va to'lov foizi bir joyda.</div>
-        </div>
-      </div>
-      <div class="guide-item">
-        <div class="gi-icon">🏗️</div>
-        <div class="gi-content">
-          <div class="gi-title">Loyiha — jarayon holati</div>
-          <div class="gi-desc">Ish boshlandi yoki tugallandi — loyiha holati va material ro'yxati.</div>
-        </div>
-      </div>
-      <div class="guide-item">
-        <div class="gi-icon">🧮</div>
-        <div class="gi-content">
-          <div class="gi-title">Kalkulyator — narx hisoblash</div>
-          <div class="gi-desc">Ish turini va m² ni tanlang — avtomatik USD va so'mda hisoblaydi.</div>
-        </div>
-      </div>
-      <div class="guide-item">
-        <div class="gi-icon">🔔</div>
-        <div class="gi-content">
-          <div class="gi-title">Xabarlar — bildirishnomalar</div>
-          <div class="gi-desc">Admin tomonidan yuborilgan xabarlar va tizim bildirnomalari.</div>
-        </div>
-      </div>
-    </div>
-
-    <button class="splash-btn" onclick="closeSplash()">DAVOM ETISH</button>
-    <div class="splash-note">Keyingi kirishda bu ekran chiqmaydi · Pastdagi ? tugma orqali qayta ko'rishingiz mumkin</div>
+    <div class="guide-list" id="splashGuideList"></div>
+    <button class="splash-btn" id="splash-continue-btn" onclick="closeSplash()">DAVOM ETISH</button>
+    <div class="splash-note" id="splash-note-text">Keyingi kirishda bu ekran chiqmaydi · Pastdagi ? tugma orqali qayta ko'rishingiz mumkin</div>
   </div>
 </div>
 
@@ -359,7 +331,7 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
       <div class="gm-item">
         <div class="gm-icon">🧮</div>
         <div class="gm-content">
-          <div class="gm-item-title">Kalkulyator</div>
+          <div class="gm-item-title">Xizmat narxlari</div>
           <div class="gm-item-desc">Ish turini tanlang, m² kiriting — narx USD va so'mda avtomatik hisoblanadi. Bir necha ish turini birga hisoblash mumkin.</div>
         </div>
       </div>
@@ -388,15 +360,20 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
 <!-- ══ LOGIN ══ -->
 <div id="loginScreen" class="screen active">
   <div class="login-box">
+    <!-- Til tanlash -->
+    <div style="display:flex;justify-content:center;gap:6px;margin-bottom:28px;">
+      <button id="login-lang-uz" onclick="setLangLogin('uz')" style="padding:7px 18px;border:1.5px solid rgba(160,120,80,.8);border-radius:99px;background:rgba(160,120,80,.9);color:#1C1510;font-family:'Jost',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:1px;">🇺🇿 UZ</button>
+      <button id="login-lang-ru" onclick="setLangLogin('ru')" style="padding:7px 18px;border:1.5px solid rgba(201,185,154,.25);border-radius:99px;background:transparent;color:rgba(201,185,154,.5);font-family:'Jost',sans-serif;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:1px;">🇷🇺 RU</button>
+    </div>
     <div class="login-logo">
       <div class="monogram">IK</div>
       <h1>IRKOM</h1>
-      <p>Klient kabineti</p>
+      <p id="login-subtitle">Klient kabineti</p>
     </div>
     <div class="login-card">
-      <label class="login-label">Ism</label>
+      <label class="login-label" id="login-name-label">Ism</label>
       <input class="login-input" type="text" id="nameInput" placeholder="Ismingizni kiriting" maxlength="40" autocomplete="off">
-      <label class="login-label">PIN kod</label>
+      <label class="login-label" id="login-pin-label">PIN kod</label>
       <div class="pin-wrap">
         <input class="login-input" type="password" id="pinInput" placeholder="• • • •" maxlength="4" inputmode="numeric" autocomplete="off" style="padding-right:90px;letter-spacing:6px;" oninput="onPinInput(this)">
         <div class="pin-dots" id="pinDots">
@@ -404,7 +381,7 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
           <div class="pin-dot" id="d3"></div><div class="pin-dot" id="d4"></div>
         </div>
       </div>
-      <button class="login-btn" onclick="doLogin()">KIRISH</button>
+      <button class="login-btn" id="login-btn-text" onclick="doLogin()">KIRISH</button>
       <div class="login-error" id="loginError"></div>
     </div>
   </div>
@@ -418,6 +395,11 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
       <div class="topbar-title">IrKom</div>
     </div>
     <div class="topbar-right">
+      <!-- Til tugmalari -->
+      <div style="display:flex;gap:2px;background:rgba(201,185,154,.1);border-radius:8px;padding:2px;">
+        <button id="lang-uz" onclick="setLang('uz')" style="padding:4px 8px;border:none;border-radius:6px;font-family:'Jost',sans-serif;font-size:10px;font-weight:600;cursor:pointer;transition:all .2s;background:rgba(160,120,80,.9);color:var(--dark);">UZ</button>
+        <button id="lang-ru" onclick="setLang('ru')" style="padding:4px 8px;border:none;border-radius:6px;font-family:'Jost',sans-serif;font-size:10px;font-weight:600;cursor:pointer;transition:all .2s;background:transparent;color:rgba(201,185,154,.5);">RU</button>
+      </div>
       <button class="notif-btn" onclick="switchPage('notiflar',document.querySelectorAll('.bn-btn')[3])">
         🔔<span class="notif-badge" id="notifBadge" style="display:none">0</span>
       </button>
@@ -439,37 +421,37 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
       </div>
       <div class="tab-panel active" id="panel-tamir">
         <div class="big-card" onclick="openModal('tamir','hisob')">
-          <div class="bc-label">Umumiy tamirlash narxi</div>
+          <div class="bc-label" id="bc-label-tamir">Umumiy tamirlash narxi</div>
           <div class="bc-value" id="t-total-val">—</div>
           <div class="bc-sub" id="t-total-sub"></div>
           <div class="bc-arrow">›</div>
         </div>
         <div class="sum-grid">
-          <div class="sum-card total" onclick="openModal('tamir','hisob')"><div class="sc-label">Jami summa</div><div class="sc-val cv-b" id="t-jami">—</div><div class="sc-hint">Tafsilot →</div></div>
-          <div class="sum-card avans" onclick="openModal('tamir','avans')"><div class="sc-label">Avans</div><div class="sc-val cv-bl" id="t-avans">—</div><div class="sc-hint">Ko'rish →</div></div>
-          <div class="sum-card paid" onclick="openModal('tamir','tolangan')"><div class="sc-label">To'langan</div><div class="sc-val cv-g" id="t-tolangan">—</div><div class="sc-hint">Tarixi →</div></div>
-          <div class="sum-card remain" onclick="openModal('tamir','qoldiq')"><div class="sc-label">Qoldiq</div><div class="sc-val cv-o" id="t-qoldiq">—</div><div class="sc-hint">Statistika →</div></div>
+          <div class="sum-card total" onclick="openModal('tamir','hisob')"><div class="sc-label" id="sc-total-t">Jami summa</div><div class="sc-val cv-b" id="t-jami">—</div><div class="sc-hint" id="hint-total-t">Tafsilot →</div></div>
+          <div class="sum-card avans" onclick="openModal('tamir','avans')"><div class="sc-label" id="sc-avans-t">Avans</div><div class="sc-val cv-bl" id="t-avans">—</div><div class="sc-hint" id="hint-avans-t">Ko'rish →</div></div>
+          <div class="sum-card paid" onclick="openModal('tamir','tolangan')"><div class="sc-label" id="sc-paid-t">To'langan</div><div class="sc-val cv-g" id="t-tolangan">—</div><div class="sc-hint" id="hint-paid-t">Tarixi →</div></div>
+          <div class="sum-card remain" onclick="openModal('tamir','qoldiq')"><div class="sc-label" id="sc-remain-t">Qoldiq</div><div class="sc-val cv-o" id="t-qoldiq">—</div><div class="sc-hint" id="hint-remain-t">Statistika →</div></div>
         </div>
         <div class="progress-section">
-          <div class="pr-header"><span class="pr-label">To'lov holati</span><span class="pr-pct" id="t-pct">0%</span></div>
+          <div class="pr-header"><span class="pr-label" id="pr-label-t">To'lov holati</span><span class="pr-pct" id="t-pct">0%</span></div>
           <div class="pr-bar-bg"><div class="pr-bar-fill" id="t-bar" style="width:0%"></div></div>
         </div>
       </div>
       <div class="tab-panel" id="panel-material">
         <div class="big-card" onclick="openModal('material','hisob')">
-          <div class="bc-label">Umumiy material narxi</div>
+          <div class="bc-label" id="bc-label-material">Umumiy material narxi</div>
           <div class="bc-value" id="m-total-val">—</div>
           <div class="bc-sub" id="m-total-sub"></div>
           <div class="bc-arrow">›</div>
         </div>
         <div class="sum-grid">
-          <div class="sum-card total" onclick="openModal('material','hisob')"><div class="sc-label">Jami summa</div><div class="sc-val cv-b" id="m-jami">—</div><div class="sc-hint">Tafsilot →</div></div>
-          <div class="sum-card avans" onclick="openModal('material','avans')"><div class="sc-label">Avans</div><div class="sc-val cv-bl" id="m-avans">—</div><div class="sc-hint">Ko'rish →</div></div>
-          <div class="sum-card paid" onclick="openModal('material','tolangan')"><div class="sc-label">To'langan</div><div class="sc-val cv-g" id="m-tolangan">—</div><div class="sc-hint">Tarixi →</div></div>
-          <div class="sum-card remain" onclick="openModal('material','qoldiq')"><div class="sc-label">Qoldiq</div><div class="sc-val cv-o" id="m-qoldiq">—</div><div class="sc-hint">Statistika →</div></div>
+          <div class="sum-card total" onclick="openModal('material','hisob')"><div class="sc-label" id="sc-total-m">Jami summa</div><div class="sc-val cv-b" id="m-jami">—</div><div class="sc-hint" id="hint-total-m">Tafsilot →</div></div>
+          <div class="sum-card avans" onclick="openModal('material','avans')"><div class="sc-label" id="sc-avans-m">Avans</div><div class="sc-val cv-bl" id="m-avans">—</div><div class="sc-hint" id="hint-avans-m">Ko'rish →</div></div>
+          <div class="sum-card paid" onclick="openModal('material','tolangan')"><div class="sc-label" id="sc-paid-m">To'langan</div><div class="sc-val cv-g" id="m-tolangan">—</div><div class="sc-hint" id="hint-paid-m">Tarixi →</div></div>
+          <div class="sum-card remain" onclick="openModal('material','qoldiq')"><div class="sc-label" id="sc-remain-m">Qoldiq</div><div class="sc-val cv-o" id="m-qoldiq">—</div><div class="sc-hint" id="hint-remain-m">Statistika →</div></div>
         </div>
         <div class="progress-section">
-          <div class="pr-header"><span class="pr-label">To'lov holati</span><span class="pr-pct" id="m-pct">0%</span></div>
+          <div class="pr-header"><span class="pr-label" id="pr-label-m">To'lov holati</span><span class="pr-pct" id="m-pct">0%</span></div>
           <div class="pr-bar-bg"><div class="pr-bar-fill" id="m-bar" style="width:0%"></div></div>
         </div>
       </div>
@@ -478,7 +460,7 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
     <!-- LOYIHA -->
     <div class="page" id="pg-loyiha">
       <div class="welcome-row">
-        <h2>Loyiha 🏗️</h2>
+        <h2 id="pg-loyiha-title">Loyiha 🏗️</h2>
         <p id="loyiha-proj-name">—</p>
       </div>
       <!-- 2 BOSQICH -->
@@ -500,7 +482,7 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
 
     <!-- KALKULYATOR -->
     <div class="page" id="pg-kalk">
-      <div class="welcome-row"><h2>Hisob-kitob 🧮</h2><p>Narxni tanlang, m² kiriting</p></div>
+      <div class="welcome-row"><h2 id="kalk-title">Xizmat narxlari 💰</h2><p id="kalk-sub">Narxni tanlang, m² kiriting</p></div>
       <div class="kurs-display">
         <div>
           <div class="kd-left">💱 1 USD = <span class="kd-rate" id="kursVal">yuklanyapti...</span></div>
@@ -534,6 +516,22 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
     <!-- BILDIRISHNOMALAR -->
     <div class="page" id="pg-notiflar">
       <div class="welcome-row"><h2>Bildirishnomalar 🔔</h2><p id="notif-sub">Barcha xabarlar</p></div>
+
+      <!-- XABAR YUBORISH -->
+      <div style="background:var(--white);border:1px solid var(--cream3);border-radius:var(--r2);padding:16px;margin-bottom:16px;">
+        <div style="font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--text-light);margin-bottom:10px;" id="send-msg-label">Xabar yuborish</div>
+        <textarea id="clientMsgText" style="width:100%;background:var(--cream);border:1.5px solid var(--cream3);border-radius:12px;padding:12px 14px;font-family:'Jost',sans-serif;font-size:14px;color:var(--text-dark);outline:none;resize:none;height:80px;transition:border-color .2s;line-height:1.6;" placeholder="Xabar yozing..."></textarea>
+        <!-- Fayl/rasm biriktirish -->
+        <div style="margin-top:8px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <label style="display:flex;align-items:center;gap:6px;padding:8px 12px;background:var(--cream);border:1px solid var(--cream3);border-radius:9px;font-size:12px;color:var(--text-mid);cursor:pointer;transition:all .2s;" onmouseover="this.style.borderColor='var(--sand)'" onmouseout="this.style.borderColor='var(--cream3)'">
+            📎 <span id="attach-label">Fayl biriktirish</span>
+            <input type="file" id="clientFileInput" style="display:none" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx" onchange="onFileSelect(this)">
+          </label>
+          <div id="filePreview" style="font-size:11px;color:var(--bronze);"></div>
+        </div>
+        <button onclick="sendClientMsg()" style="width:100%;margin-top:10px;padding:12px;background:linear-gradient(135deg,var(--bronze),#C49A60);border:none;border-radius:11px;font-family:'Jost',sans-serif;font-size:12px;font-weight:500;letter-spacing:1.5px;text-transform:uppercase;color:var(--dark);cursor:pointer;" id="send-btn">📤 Yuborish</button>
+      </div>
+
       <div id="notifsList"></div>
     </div>
   </div>
@@ -541,7 +539,7 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
   <div class="bottom-nav">
     <button class="bn-btn active" onclick="switchPage('asosiy',this)"><span class="bn-icon">🏠</span><span class="bn-label">Asosiy</span></button>
     <button class="bn-btn" onclick="switchPage('loyiha',this)"><span class="bn-icon">🏗️</span><span class="bn-label">Loyiha</span></button>
-    <button class="bn-btn" onclick="switchPage('kalk',this)"><span class="bn-icon">🧮</span><span class="bn-label">Kalkulyator</span></button>
+    <button class="bn-btn" onclick="switchPage('kalk',this)"><span class="bn-icon">💰</span><span class="bn-label" id="bn-kalk-label">Narxlar</span></button>
     <button class="bn-btn" onclick="switchPage('notiflar',this)"><span class="bn-icon">🔔</span><span class="bn-label">Xabarlar</span></button>
   </div>
 </div>
@@ -560,6 +558,173 @@ html,body{min-height:100%;background:var(--cream);font-family:'Jost',sans-serif;
 
 <script>
 const SB_URL='https://hmkcinbhemfayqiuggir.supabase.co';
+/* ══ TIL TIZIMI ══ */
+let currentLang=localStorage.getItem('irkom_lang')||'uz';
+const T={
+  uz:{
+    home:'Asosiy',project:'Loyiha',prices:'Narxlar',messages:'Xabarlar',
+    welcome:'Salom',projectStatus:'Loyiha holati',
+    tamir:'Tamirlash narxi',material:'Material narxi',
+    total:'Jami summa',avans:'Avans',paid:"To'langan",remain:'Qoldiq',
+    payStatus:"To'lov holati",detail:'Tafsilot →',history:'Tarixi →',stats:'Statistika →',
+    started:'Ish boshlandi',done:'Ish tugadi',materials:'Materiallar',
+    sendMsg:'Xabar yuborish',msgPlaceholder:'Xabar yozing...',send:'Yuborish',
+    attach:'Fayl biriktirish',noMsg:"Hali xabar yo'q",
+    prices_title:'Xizmat narxlari 💰',prices_sub:'Narxni tanlang, m² kiriting',
+    selected:'Tanlangan ishlar',clear:'Tozalash',total_usd:'Jami (USD)',total_uzs:'Jami (UZS)',
+    guide_title:"Ilova qo'llanmasi",started_work:'Ish boshlandi',done_work:'Ish tugadi',
+    subtitle:'Klient kabineti',name_label:'Ism',pin_label:'PIN kod',name_ph:'Ismingizni kiriting',login_btn:'KIRISH',login_err:"Ism yoki PIN noto'g'ri",
+    tagline:"Premium ta'mirlash xizmati",welcome_title:'Xush kelibsiz, hurmatli mijoz!',
+    welcome_text:"Ushbu ilova sizning vaqtingizni tejash hamda xizmat jarayonini to'liq kuzatib borish maqsadida maxsus tayyorlangan. Bizni tanlaganingiz uchun rahmat!",
+    continue_btn:'DAVOM ETISH',splash_note:"Keyingi kirishda bu ekran chiqmaydi · ? tugma orqali qayta ko'ring",
+    guide:[
+      {icon:'🏠',title:'Asosiy — moliyaviy holat',desc:"Tamirlash va material bo'yicha summa, to'langan, avans, qoldiq bir joyda."},
+      {icon:'🏗️',title:'Loyiha — jarayon holati',desc:"Ish holati va material ro'yxatini ko'ring."},
+      {icon:'💰',title:'Xizmat narxlari',desc:"Ish turini va m² ni tanlang — USD va so'mda hisoblaydi."},
+      {icon:'🔔',title:'Xabarlar',desc:'Admin xabarlari va tizim bildirnomalari.'},
+    ],
+  },
+  ru:{
+    home:'Главная',project:'Проект',prices:'Цены',messages:'Сообщения',
+    welcome:'Привет',projectStatus:'Статус проекта',
+    tamir:'Стоимость ремонта',material:'Стоимость материалов',
+    total:'Общая сумма',avans:'Аванс',paid:'Оплачено',remain:'Остаток',
+    payStatus:'Статус оплаты',detail:'Детали →',history:'История →',stats:'Статистика →',
+    started:'Работа начата',done:'Работа завершена',materials:'Материалы',
+    sendMsg:'Отправить сообщение',msgPlaceholder:'Напишите сообщение...',send:'Отправить',
+    attach:'Прикрепить файл',noMsg:'Нет сообщений',
+    prices_title:'Цены на услуги 💰',prices_sub:'Выберите цену, введите м²',
+    selected:'Выбранные работы',clear:'Очистить',total_usd:'Итого (USD)',total_uzs:'Итого (сум)',
+    guide_title:'Руководство по приложению',started_work:'Работа начата',done_work:'Работа завершена',
+    subtitle:'Кабинет клиента',name_label:'Имя',pin_label:'PIN-код',name_ph:'Введите ваше имя',login_btn:'ВОЙТИ',login_err:'Неверное имя или PIN-код',
+    tagline:'Премиальный ремонт',welcome_title:'Добро пожаловать, уважаемый клиент!',
+    welcome_text:'Это приложение создано для экономии вашего времени и отслеживания хода работ. Спасибо, что выбрали нас!',
+    continue_btn:'ПРОДОЛЖИТЬ',splash_note:'При следующем входе этот экран не появится · Используйте ? для повторного просмотра',
+    guide:[
+      {icon:'🏠',title:'Главная — финансовый статус',desc:'Общая сумма, оплачено, аванс, остаток в одном месте.'},
+      {icon:'🏗️',title:'Проект — статус работ',desc:'Статус проекта и список материалов.'},
+      {icon:'💰',title:'Цены на услуги',desc:'Выберите вид работ и м² — считается в USD и сумах.'},
+      {icon:'🔔',title:'Сообщения',desc:'Сообщения от администратора и уведомления.'},
+    ],
+  }
+};
+function t(key){return (T[currentLang]||T.uz)[key]||key;}
+
+function setLangLogin(lang){
+  currentLang=lang;localStorage.setItem('irkom_lang',lang);
+  updateLoginLangBtns();applyLoginLang();renderSplashContent();
+}
+function setLangSplash(lang){
+  currentLang=lang;localStorage.setItem('irkom_lang',lang);
+  updateSplashLangBtns();renderSplashContent();applyLoginLang();updateLoginLangBtns();
+}
+function updateLoginLangBtns(){
+  const isUz=currentLang==='uz';
+  const uz=document.getElementById('login-lang-uz'),ru=document.getElementById('login-lang-ru');
+  if(uz){uz.style.background=isUz?'rgba(160,120,80,.9)':'transparent';uz.style.color=isUz?'#1C1510':'rgba(201,185,154,.5)';uz.style.borderColor=isUz?'rgba(160,120,80,.8)':'rgba(201,185,154,.25)';}
+  if(ru){ru.style.background=!isUz?'rgba(160,120,80,.9)':'transparent';ru.style.color=!isUz?'#1C1510':'rgba(201,185,154,.5)';ru.style.borderColor=!isUz?'rgba(160,120,80,.8)':'rgba(201,185,154,.25)';}
+}
+function updateSplashLangBtns(){
+  const isUz=currentLang==='uz';
+  const uz=document.getElementById('splash-lang-uz'),ru=document.getElementById('splash-lang-ru');
+  if(uz){uz.style.background=isUz?'rgba(160,120,80,.9)':'transparent';uz.style.color=isUz?'#1C1510':'rgba(201,185,154,.45)';uz.style.borderColor=isUz?'rgba(160,120,80,.8)':'rgba(201,185,154,.2)';}
+  if(ru){ru.style.background=!isUz?'rgba(160,120,80,.9)':'transparent';ru.style.color=!isUz?'#1C1510':'rgba(201,185,154,.45)';ru.style.borderColor=!isUz?'rgba(160,120,80,.8)':'rgba(201,185,154,.2)';}
+}
+function applyLoginLang(){
+  const ids={
+    'login-subtitle':'subtitle','login-name-label':'name_label','login-pin-label':'pin_label',
+    'nameInput':'name_ph','login-btn-text':'login_btn'
+  };
+  Object.entries(ids).forEach(([id,key])=>{
+    const el=document.getElementById(id);
+    if(!el) return;
+    if(el.tagName==='INPUT') el.placeholder=t(key);
+    else el.textContent=t(key);
+  });
+}
+function renderSplashContent(){
+  const ids={'splash-tagline':'tagline','splash-welcome-title':'welcome_title','splash-welcome-text':'welcome_text','splash-continue-btn':'continue_btn','splash-note-text':'splash_note'};
+  Object.entries(ids).forEach(([id,key])=>{const el=document.getElementById(id);if(el)el.textContent=t(key);});
+  const gl=document.getElementById('splashGuideList');
+  if(gl) gl.innerHTML=(T[currentLang].guide||T.uz.guide).map(g=>`
+    <div class="guide-item"><div class="gi-icon">${g.icon}</div><div class="gi-content"><div class="gi-title">${g.title}</div><div class="gi-desc">${g.desc}</div></div></div>`).join('');
+  updateSplashLangBtns();
+}
+
+function setLang(lang){
+  currentLang=lang;localStorage.setItem('irkom_lang',lang);
+  const uzb=document.getElementById('lang-uz'),rub=document.getElementById('lang-ru');
+  if(uzb)uzb.classList.toggle('active',lang==='uz');
+  if(rub)rub.classList.toggle('active',lang==='ru');
+  if(currentClient) applyLang();
+}
+function applyLang(){
+  const ru=currentLang==='ru';
+  // Bottom nav
+  const navKeys=['home','project','prices','messages'];
+  document.querySelectorAll('.bn-btn').forEach((btn,i)=>{
+    const lb=btn.querySelector('.bn-label');
+    if(lb) lb.textContent=t(navKeys[i]);
+  });
+  // Sahifa sarlavhalari
+  const klt=document.getElementById('kalk-title');const kls=document.getElementById('kalk-sub');
+  if(klt) klt.textContent=t('prices_title');
+  if(kls) kls.textContent=t('prices_sub');
+  // Tab labels
+  const tabT=document.getElementById('tab-tamir');const tabM=document.getElementById('tab-material');
+  if(tabT) tabT.innerHTML=`<span class="tab-icon">🔨</span>${t('tamir')}`;
+  if(tabM) tabM.innerHTML=`<span class="tab-icon">🧱</span>${t('material')}`;
+  // Welcome
+  const wn=document.getElementById('welcomeName');const ws=document.getElementById('welcomeSub');
+  if(wn&&currentClient) wn.textContent=(ru?'Привет, ':'Salom, ')+currentClient.name.split(' ')[0]+' 👋';
+  if(ws&&currentClient) ws.textContent=currentClient.project||'—';
+  // BC labels
+  const bcT=document.getElementById('bc-label-tamir');const bcM=document.getElementById('bc-label-material');
+  if(bcT) bcT.textContent=ru?'Общая стоимость ремонта':'Umumiy tamirlash narxi';
+  if(bcM) bcM.textContent=ru?'Общая стоимость материалов':'Umumiy material narxi';
+  // Sum cards — Tamirlash
+  const labels={
+    'sc-total-t':t('total'),'sc-avans-t':t('avans'),'sc-paid-t':t('paid'),'sc-remain-t':t('remain'),
+    'sc-total-m':t('total'),'sc-avans-m':t('avans'),'sc-paid-m':t('paid'),'sc-remain-m':t('remain'),
+    'pr-label-t':t('payStatus'),'pr-label-m':t('payStatus'),
+    'hint-total-t':t('detail'),'hint-avans-t':ru?'Смотреть →':'Ko\'rish →',
+    'hint-paid-t':t('history'),'hint-remain-t':t('stats'),
+    'hint-total-m':t('detail'),'hint-avans-m':ru?'Смотреть →':'Ko\'rish →',
+    'hint-paid-m':t('history'),'hint-remain-m':t('stats'),
+  };
+  Object.entries(labels).forEach(([id,val])=>{const el=document.getElementById(id);if(el)el.textContent=val;});
+  // Loyiha sahifasi
+  const plt=document.getElementById('pg-loyiha-title');
+  if(plt) plt.textContent=ru?'Проект 🏗️':'Loyiha 🏗️';
+  const p2Title=document.getElementById('p2-title-text');
+  if(p2Title) p2Title.textContent=ru?'Статус работ':'Ish jarayoni holati';
+  // Materials header
+  const matTitle=document.getElementById('mat-title-text');
+  if(matTitle) matTitle.textContent=ru?'Список материалов':'Materiallar ro\'yxati';
+  // Bildirishnomalar
+  const sml=document.getElementById('send-msg-label');
+  if(sml) sml.textContent=t('sendMsg');
+  const al=document.getElementById('attach-label');
+  if(al) al.textContent=t('attach');
+  const sb=document.getElementById('send-btn');
+  if(sb) sb.textContent='📤 '+t('send');
+  const cmt=document.getElementById('clientMsgText');
+  if(cmt) cmt.placeholder=t('msgPlaceholder');
+  // Kalkulyator summary
+  const selT=document.querySelector('#summarySection>div>div');
+  if(selT) selT.textContent=t('selected');
+  const clrBtn=document.querySelector('#summarySection button');
+  if(clrBtn) clrBtn.innerHTML='🗑 '+t('clear');
+  const gtUsd=document.getElementById('gt-usd-label');
+  if(gtUsd) gtUsd.textContent=t('total_usd');
+  const gtUzs=document.getElementById('gt-uzs-label');
+  if(gtUzs) gtUzs.textContent=t('total_uzs');
+  // Lang buttons (dashboard)
+  const lu=document.getElementById('lang-uz');const lr=document.getElementById('lang-ru');
+  if(lu){lu.classList.toggle('active',!ru);}
+  if(lr){lr.classList.toggle('active',ru);}
+  renderNotifs();
+}
 const SB_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imhta2NpbmJoZW1mYXlxaXVnZ2lyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk3MjE2MDUsImV4cCI6MjA5NTI5NzYwNX0.NkmPGWtHwJKfR5K90lRAFmRqdFJ9XMri64Kg9TYnECU';
 const SB_H={'apikey':SB_KEY,'Authorization':'Bearer '+SB_KEY,'Content-Type':'application/json'};
 let USD_RATE=12800,currency='usd',currentClient=null,selected={};
@@ -569,6 +734,7 @@ function checkSplash(){
   const key='irkom_splash_'+currentClient.id;
   const seen=localStorage.getItem(key);
   if(!seen){
+    renderSplashContent();
     document.getElementById('splashScreen').classList.add('active');
   }
 }
@@ -731,15 +897,22 @@ function initDash(){
   const c=currentClient;
   const ini=c.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
   document.getElementById('avatarLetters').textContent=ini;
-  document.getElementById('welcomeName').textContent='Salom, '+c.name.split(' ')[0]+' 👋';
+  document.getElementById('welcomeName').textContent=(currentLang==='ru'?'Привет, ':'Salom, ')+c.name.split(' ')[0]+' 👋';
   document.getElementById('welcomeSub').textContent=c.project||'Loyihangiz';
   document.getElementById('loyiha-proj-name').textContent=c.project||'—';
+  // Til tugmalarini yangilash
+  document.getElementById('lang-uz').style.background=currentLang==='uz'?'rgba(160,120,80,.9)':'transparent';
+  document.getElementById('lang-uz').style.color=currentLang==='uz'?'var(--dark)':'rgba(201,185,154,.5)';
+  document.getElementById('lang-ru').style.background=currentLang==='ru'?'rgba(160,120,80,.9)':'transparent';
+  document.getElementById('lang-ru').style.color=currentLang==='ru'?'var(--dark)':'rgba(201,185,154,.5)';
   renderFinance();
   render2Step();
   renderMatItems();
   renderNotifs();
+  updateBadge();
   loadKurs();
   renderServicesList();
+  applyLang();
 }
 
 /* ══ FINANCE ══ */
@@ -793,22 +966,50 @@ function renderMatItems(){
 }
 
 /* ══ NOTIFICATIONS ══ */
-function renderNotifs(){
+function markAllRead(){
+  const c=currentClient;
+  if(!c.messages) return;
+  c.messages.forEach(m=>m.read=true);
+  // Supabase ga saqlash
+  try{sbSet('clients',c.id,c);}catch(e){}
+  localStorage.setItem('irkom_v3',JSON.stringify(getClients().map(x=>x.id===c.id?c:x)));
+  updateBadge();
+}
+function updateBadge(){
   const c=currentClient;
   const msgs=c.messages||[];
   const unread=msgs.filter(m=>!m.read).length;
   const badge=document.getElementById('notifBadge');
-  badge.textContent=unread;badge.style.display=unread?'flex':'none';
-  document.getElementById('notif-sub').textContent=msgs.length+' ta xabar';
+  if(badge){badge.textContent=unread;badge.style.display=unread>0?'flex':'none';}
+}
+function renderNotifs(){
+  const c=currentClient;
+  const msgs=c.messages||[];
+  // Barcha xabarlarni o'qilgan deb belgilash
+  markAllRead();
+  const lang=currentLang;
   const sysNotifs=[
-    {icon:'🏗️',title:'Loyiha holati',text:c.status==='done'?'Loyihangiz muvaffaqiyatli yakunlandi!':'Loyiha ish jarayonida davom etmoqda.',date:'Bugun',unread:false},
+    {icon:'🏗️',title:lang==='ru'?'Статус проекта':'Loyiha holati',
+     text:c.status==='done'?(lang==='ru'?'Ваш проект успешно завершён!':'Loyihangiz muvaffaqiyatli yakunlandi!'):(lang==='ru'?'Проект в процессе работы.':'Loyiha ish jarayonida.'),date:lang==='ru'?'Сегодня':'Bugun',unread:false},
   ];
-  const all=[...msgs.map(m=>({...m,icon:'💬',title:'Admin xabari',unread:!m.read})),...sysNotifs];
+  const all=[...msgs.map(m=>({...m,icon:'💬',title:lang==='ru'?'Сообщение от администратора':'Admin xabari',unread:false})),...sysNotifs];
+  const sub=document.getElementById('notif-sub');
+  if(sub) sub.textContent=msgs.length+(lang==='ru'?' сообщений':' ta xabar');
+  
   document.getElementById('notifsList').innerHTML=all.length?all.map(n=>`
-    <div class="notif-item ${n.unread?'unread':'read'}">
+    <div class="notif-item read">
       <div class="ni-icon">${n.icon}</div>
-      <div style="flex:1"><div class="ni-title">${n.title}</div><div class="ni-text">${n.text}</div><div class="ni-time">${n.date}</div></div>
-    </div>`).join(''):'<div style="text-align:center;padding:40px;color:var(--text-light)"><div style="font-size:36px;margin-bottom:10px">🔔</div>Hali xabar yo\'q</div>';
+      <div style="flex:1">
+        <div class="ni-title">${n.title}</div>
+        <div class="ni-text">${n.text}</div>
+        ${n.file?`<div style="margin-top:6px"><a href="${n.file}" target="_blank" style="font-size:11px;color:var(--sand);text-decoration:none;">📎 ${n.fileName||'Fayl'}</a></div>`:''}
+        <div class="ni-time">${n.date}</div>
+      </div>
+    </div>`).join(''):'<div style="text-align:center;padding:40px;color:var(--text-light)"><div style="font-size:36px;margin-bottom:10px">🔔</div>'+(lang==='ru'?'Нет сообщений':'Hali xabar yo\'q')+'</div>';
+  
+  // Klient xabar yuborish formasi
+  const sendForm=document.getElementById('clientMsgForm');
+  if(!sendForm) return;
 }
 
 /* ══ TABS & PAGES ══ */
@@ -825,7 +1026,7 @@ function switchPage(name,btn){
   if(btn) btn.classList.add('active');
   if(name==='kalk'){renderServicesList();renderCalcTotals();}
   if(name==='loyiha'){render2Step();renderMatItems();}
-  if(name==='notiflar'){renderNotifs();}
+  if(name==='notiflar'){renderNotifs();markAllRead();updateBadge();}
 }
 
 /* ══ MODAL ══ */
@@ -833,14 +1034,21 @@ function openModal(sec,type){
   const c=currentClient;
   const data=c[sec];
   const{avS,tolS,hisobS,itemsS,jami,qoldiq,pct}=calcSec(data);
-  const sLabel=sec==='tamir'?'Tamirlash':'Material';
-  const titles={hisob:sLabel+' · Hisob-kitob',avans:sLabel+' · Avanslar',tolangan:sLabel+' · To\'langan',qoldiq:sLabel+' · Statistika'};
-  document.getElementById('modalTitle').textContent=titles[type];
+  const ru=currentLang==='ru';
+  const sLabel=sec==='tamir'?(ru?'Ремонт':'Tamirlash'):(ru?'Материалы':'Material');
+  const titles={
+    hisob:sLabel+' · '+(ru?'Детали':'Hisob-kitob'),
+    avans:sLabel+' · '+(ru?'Авансы':'Avanslar'),
+    tolandan:sLabel+' · '+(ru?'Оплачено':"To'langan"),
+    tolangan:sLabel+' · '+(ru?'Оплачено':"To'langan"),
+    qoldiq:sLabel+' · '+(ru?'Статистика':'Statistika'),
+  };
+  document.getElementById('modalTitle').textContent=titles[type]||sLabel;
   let body='';
   if(type==='hisob'){
-    /* Tamirlash - kalkulyatordan, Material - items */
     const isMatSec=sec==='material';
     const items=isMatSec?(data.items||[]):(data.hisob||[]);
+    const emptyText=ru?'Ещё не добавлено':'Hali kiritilmagan';
     const rows=items.length?items.map(h=>{
       if(isMatSec){
         const total=h.qty*(h.price||0);
@@ -863,26 +1071,30 @@ function openModal(sec,type){
           <div style="height:3px;background:var(--cream3);border-radius:99px;overflow:hidden;"><div style="height:100%;width:${pctH}%;background:linear-gradient(90deg,var(--bronze),#C49A60);border-radius:99px;"></div></div>
         </div>`;
       }
-    }).join(''):'<div style="text-align:center;padding:20px;color:var(--text-light);">Hali kiritilmagan</div>';
+    }).join(''):`<div style="text-align:center;padding:20px;color:var(--text-light);">${emptyText}</div>`;
     const totalVal=isMatSec?itemsS:hisobS;
-    body=`<div class="m-sec-title">Jami: ${fmtUSD(totalVal/USD_RATE)} · ${fmt(totalVal)}</div>${rows}`;
+    body=`<div class="m-sec-title">${ru?'Итого':'Jami'}: ${fmtUSD(totalVal/USD_RATE)} · ${fmt(totalVal)}</div>${rows}`;
   }
   else if(type==='avans'){
-    const rows=(data.avanslar||[]).length?`${(data.avanslar||[]).map(a=>`<div class="data-row"><div><div class="dr-name">${a.note||'Avans'}</div><div class="dr-sub">📅 ${a.date}</div></div><div class="dr-val cv-bl">+${fmt(a.amount)}</div></div>`).join('')}`:'<div style="text-align:center;padding:20px;color:var(--text-light);">Avanslar yo\'q</div>';
-    body=`<div class="m-sec-title">Jami avans: ${fmt(avS)}</div>${rows}`;
+    const emptyText=ru?'Авансов нет':"Avanslar yo'q";
+    const rows=(data.avanslar||[]).length?`${(data.avanslar||[]).map(a=>`<div class="data-row"><div><div class="dr-name">${a.note||(ru?'Аванс':'Avans')}</div><div class="dr-sub">📅 ${a.date}</div></div><div class="dr-val cv-bl">+${fmt(a.amount)}</div></div>`).join('')}`:`<div style="text-align:center;padding:20px;color:var(--text-light);">${emptyText}</div>`;
+    body=`<div class="m-sec-title">${ru?'Итого авансов':'Jami avans'}: ${fmt(avS)}</div>${rows}`;
   }
   else if(type==='tolangan'){
-    const rows=(data.tolangan||[]).length?`${(data.tolangan||[]).map(t=>`<div class="data-row"><div><div class="dr-name">${t.note||"To'lov"}</div><div class="dr-sub">📅 ${t.date}</div></div><div class="dr-val cv-g">+${fmt(t.amount)}</div></div>`).join('')}`:'<div style="text-align:center;padding:20px;color:var(--text-light);">To\'lovlar yo\'q</div>';
-    body=`<div class="m-sec-title">Jami to'langan: ${fmt(tolS)}</div>${rows}`;
+    const emptyText=ru?'Платежей нет':"To'lovlar yo'q";
+    const rows=(data.tolangan||[]).length?`${(data.tolangan||[]).map(t=>`<div class="data-row"><div><div class="dr-name">${t.note||(ru?"To'lov":"To'lov")}</div><div class="dr-sub">📅 ${t.date}</div></div><div class="dr-val cv-g">+${fmt(t.amount)}</div></div>`).join('')}`:`<div style="text-align:center;padding:20px;color:var(--text-light);">${emptyText}</div>`;
+    body=`<div class="m-sec-title">${ru?'Итого оплачено':"Jami to'langan"}: ${fmt(tolS)}</div>${rows}`;
   }
   else if(type==='qoldiq'){
     body=`<div class="stats-grid">
-      <div class="stat-item"><div class="si-label">Umumiy narx</div><div class="si-val cv-b">${fmt(jami)}</div></div>
-      <div class="stat-item"><div class="si-label">To'langan</div><div class="si-val cv-g">${fmt(tolS)}</div></div>
-      <div class="stat-item"><div class="si-label">Avans</div><div class="si-val cv-bl">${fmt(avS)}</div></div>
-      <div class="stat-item"><div class="si-label">Qoldiq</div><div class="si-val cv-o">${fmt(qoldiq)}</div></div>
-      <div class="stat-item" style="grid-column:1/-1"><div class="si-label">To'lov foizi</div>
-        <div style="margin-top:8px"><div style="display:flex;justify-content:space-between;margin-bottom:6px"><span style="font-size:12px;color:var(--text-mid)">Bajarildi</span><span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--bronze)">${pct}%</span></div>
+      <div class="stat-item"><div class="si-label">${ru?'Общая сумма':'Umumiy narx'}</div><div class="si-val cv-b">${fmt(jami)}</div></div>
+      <div class="stat-item"><div class="si-label">${ru?'Оплачено':"To'langan"}</div><div class="si-val cv-g">${fmt(tolS)}</div></div>
+      <div class="stat-item"><div class="si-label">${ru?'Аванс':'Avans'}</div><div class="si-val cv-bl">${fmt(avS)}</div></div>
+      <div class="stat-item"><div class="si-label">${ru?'Остаток':'Qoldiq'}</div><div class="si-val cv-o">${fmt(qoldiq)}</div></div>
+      <div class="stat-item" style="grid-column:1/-1"><div class="si-label">${ru?'Процент оплаты':"To'lov foizi"}</div>
+        <div style="margin-top:8px"><div style="display:flex;justify-content:space-between;margin-bottom:6px">
+          <span style="font-size:12px;color:var(--text-mid)">${ru?'Выполнено':'Bajarildi'}</span>
+          <span style="font-family:'Cormorant Garamond',serif;font-size:20px;font-weight:700;color:var(--bronze)">${pct}%</span></div>
         <div style="height:7px;background:var(--cream2);border-radius:99px;overflow:hidden"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,var(--bronze),#C49A60);border-radius:99px"></div></div></div>
       </div>
     </div>`;
@@ -893,7 +1105,70 @@ function openModal(sec,type){
 }
 function closeModal(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow='';}
 
-/* ══ KALKULYATOR ══ */
+let selectedFile=null;
+function onFileSelect(input){
+  const file=input.files[0];
+  if(!file) return;
+  selectedFile=file;
+  document.getElementById('filePreview').textContent='📎 '+file.name;
+}
+
+async function sendClientMsg(){
+  const text=document.getElementById('clientMsgText').value.trim();
+  if(!text&&!selectedFile){toast(currentLang==='ru'?'❗ Напишите сообщение':'❗ Xabar yozing');return;}
+  const btn=document.getElementById('send-btn');
+  btn.textContent=currentLang==='ru'?'Отправляется...':'Yuborilmoqda...';
+  btn.disabled=true;
+
+  const now=new Date();
+  const months=currentLang==='ru'?['Янв','Фев','Мар','Апр','Май','Июн','Июл','Авг','Сен','Окт','Ноя','Дек']:['Yan','Feb','Mar','Apr','May','Iyn','Iyl','Avg','Sen','Okt','Noy','Dek'];
+  const dateStr=now.getDate()+' '+months[now.getMonth()]+' '+now.getFullYear()+', '+now.getHours()+':'+(now.getMinutes()<10?'0':'')+now.getMinutes();
+
+  let fileData=null;
+  let fileName=null;
+  if(selectedFile){
+    try{
+      fileData=await new Promise((res,rej)=>{
+        const r=new FileReader();
+        r.onload=e=>res(e.target.result);
+        r.onerror=()=>rej(new Error('Read failed'));
+        r.readAsDataURL(selectedFile);
+      });
+      fileName=selectedFile.name;
+    }catch(e){}
+  }
+
+  const msg={
+    id:'cm'+Date.now(),
+    text:text||(currentLang==='ru'?'Файл отправлен':'Fayl yuborildi'),
+    date:dateStr,
+    from:'client',
+    read:false,
+    file:fileData||null,
+    fileName:fileName||null,
+  };
+
+  if(!currentClient.clientMessages) currentClient.clientMessages=[];
+  currentClient.clientMessages.push(msg);
+
+  try{
+    await sbSet('clients',currentClient.id,currentClient);
+    localStorage.setItem('irkom_v3',JSON.stringify(getClients().map(x=>x.id===currentClient.id?currentClient:x)));
+    toast(currentLang==='ru'?'✅ Сообщение отправлено!':'✅ Xabar yuborildi!');
+  }catch(e){
+    toast(currentLang==='ru'?'⚠️ Ошибка отправки':'⚠️ Xatolik yuz berdi');
+  }
+
+  document.getElementById('clientMsgText').value='';
+  document.getElementById('filePreview').textContent='';
+  selectedFile=null;
+  document.getElementById('clientFileInput').value='';
+  btn.textContent='📤 '+(currentLang==='ru'?'Отправить':'Yuborish');
+  btn.disabled=false;
+  renderNotifs();
+}
+
+
 const SERVICES=[
   {id:'s1',icon:'🖌️',name:'Маляркa',range:[7,20],options:[7,10,12,15,18,20]},
   {id:'s2',icon:'🌿',name:'Обой',range:[8,8],options:[8]},
@@ -948,7 +1223,9 @@ function renderServicesList(){
 }
 
 /* ══ INIT CHECK ══ */
-// Splash faqat login qilgandan keyin tekshiriladi
+// Sahifa ochilganda login tilini qo'llash
+applyLoginLang();
+updateLoginLangBtns();
 </script>
 </body>
 </html>
