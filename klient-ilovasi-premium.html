@@ -917,6 +917,9 @@ function initDash(){
   loadKurs();
   renderServicesList();
   applyLang();
+  // Yangi xabarlarni tekshirish (har 15 sekund)
+  if(window._pollInterval) clearInterval(window._pollInterval);
+  window._pollInterval=setInterval(pollAdminMessages,15000);
 }
 
 /* ══ FINANCE ══ */
@@ -981,10 +984,31 @@ function markAllRead(){
 }
 function updateBadge(){
   const c=currentClient;
-  const msgs=c.messages||[];
-  const unread=msgs.filter(m=>!m.read).length;
+  const msgs=(c.messages||[]).filter(m=>!m.read).length;
   const badge=document.getElementById('notifBadge');
-  if(badge){badge.textContent=unread;badge.style.display=unread>0?'flex':'none';}
+  if(badge){badge.textContent=msgs;badge.style.display=msgs>0?'flex':'none';}
+}
+
+// Har 15 soniyada admin xabarlarini tekshirish
+async function pollAdminMessages(){
+  if(!currentClient) return;
+  try{
+    const r=await fetch(`${SB_URL}/rest/v1/clients?id=eq.${currentClient.id}&select=data`,{headers:SB_H});
+    const rows=await r.json();
+    if(!rows||!rows[0]||!rows[0].data) return;
+    const fresh=rows[0].data;
+    const oldCount=(currentClient.messages||[]).length;
+    const newCount=(fresh.messages||[]).length;
+    if(newCount>oldCount){
+      // Yangi xabar keldi!
+      currentClient.messages=fresh.messages;
+      const unread=(fresh.messages||[]).filter(m=>!m.read).length;
+      updateBadge();
+      // Bildirishnoma sahifasida bo'lsa yangilasin
+      const notifPage=document.getElementById('pg-notiflar');
+      if(notifPage&&notifPage.classList.contains('active')) renderNotifs();
+    }
+  }catch(e){}
 }
 function renderNotifs(){
   const c=currentClient;

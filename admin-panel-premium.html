@@ -1410,26 +1410,63 @@ function closeConfirm(){const o=document.getElementById('confirmOverlay');if(o)o
 
 /* ══ XABARLAR ══ */
 function updateMsgCount(){
-  const total=clients.reduce((a,c)=>(a+(c.messages||[]).length),0);
+  // Klientlardan kelgan o'qilmagan xabarlar soni
+  const total=clients.reduce((a,c)=>{
+    const unread=(c.clientMessages||[]).filter(m=>!m.adminRead).length;
+    return a+unread;
+  },0);
   const el=document.getElementById('msg-count');
   el.textContent=total;
   el.classList.toggle('show',total>0);
 }
+
+// Har 15 soniyada Supabase dan yangi xabarlarni tekshirish
+async function pollNewMessages(){
+  try{
+    const rows=await sbGetAll('clients');
+    if(!rows||rows.error) return;
+    let hasNew=false;
+    rows.forEach(row=>{
+      if(!row.data) return;
+      const fresh=row.data;
+      const existing=clients.find(x=>x.id===fresh.id);
+      if(existing){
+        const newClientMsgs=(fresh.clientMessages||[]).filter(m=>!m.adminRead);
+        const oldCount=(existing.clientMessages||[]).filter(m=>!m.adminRead).length;
+        if(newClientMsgs.length>oldCount){
+          hasNew=true;
+          existing.clientMessages=fresh.clientMessages;
+        }
+      }
+    });
+    if(hasNew){
+      localStorage.setItem('irkom_v3',JSON.stringify(clients));
+      updateMsgCount();
+      renderMsgClients();
+    }
+  }catch(e){}
+}
+setInterval(pollNewMessages,15000);
+
 function renderMsgClients(){
   const list=document.getElementById('msgClientsList');
   if(!clients.length){list.innerHTML='<div class="empty-sm"><div class="em-icon">💬</div>Klientlar yo\'q</div>';return;}
   list.innerHTML=clients.map(c=>{
     const msgs=c.messages||[];
-    const last=msgs.length?msgs[msgs.length-1]:{};
+    const clientMsgs=c.clientMessages||[];
+    const allMsgs=[...msgs.map(m=>({...m,from:'admin'})),...clientMsgs.map(m=>({...m,from:'client'}))];
+    allMsgs.sort((a,b)=>a.id>b.id?1:-1);
+    const last=allMsgs.length?allMsgs[allMsgs.length-1]:{};
+    const unreadCount=clientMsgs.filter(m=>!m.adminRead).length;
     return `<div class="mpc-row" onclick="openMsgModal('${c.id}')">
       <div class="mpc-avatar">${initials(c.name)}</div>
       <div class="mpc-info">
         <div class="mpc-name">${c.name}</div>
-        <div class="mpc-last">${last.text||'Hali xabar yo\'q'}</div>
+        <div class="mpc-last">${last.from==='client'?'👤 '+last.text:last.text||'Hali xabar yo\'q'}</div>
       </div>
       <div class="mpc-meta">
         <div class="mpc-time">${last.date||''}</div>
-        ${msgs.length?`<div class="mpc-unread">${msgs.length}</div>`:''}
+        ${unreadCount>0?`<div class="mpc-unread">${unreadCount}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1440,16 +1477,20 @@ function filterMsgClients(q){
   if(!filtered.length){list.innerHTML='<div class="no-results"><div class="nr-icon">🔍</div><div class="nr-title">Topilmadi</div></div>';return;}
   list.innerHTML=filtered.map(c=>{
     const msgs=c.messages||[];
-    const last=msgs.length?msgs[msgs.length-1]:{};
+    const clientMsgs=c.clientMessages||[];
+    const allMsgs=[...msgs.map(m=>({...m,from:'admin'})),...clientMsgs.map(m=>({...m,from:'client'}))];
+    allMsgs.sort((a,b)=>a.id>b.id?1:-1);
+    const last=allMsgs.length?allMsgs[allMsgs.length-1]:{};
+    const unreadCount=clientMsgs.filter(m=>!m.adminRead).length;
     return `<div class="mpc-row" onclick="openMsgModal('${c.id}')">
       <div class="mpc-avatar">${initials(c.name)}</div>
       <div class="mpc-info">
         <div class="mpc-name">${c.name}</div>
-        <div class="mpc-last">${last.text||'Hali xabar yo\'q'}</div>
+        <div class="mpc-last">${last.from==='client'?'👤 '+last.text:last.text||'Hali xabar yo\'q'}</div>
       </div>
       <div class="mpc-meta">
         <div class="mpc-time">${last.date||''}</div>
-        ${msgs.length?`<div class="mpc-unread">${msgs.length}</div>`:''}
+        ${unreadCount>0?`<div class="mpc-unread">${unreadCount}</div>`:''}
       </div>
     </div>`;
   }).join('');
@@ -1467,6 +1508,15 @@ function openMsgModal(cid){
   const c=clients.find(x=>x.id===cid);
   if(!c) return;
   if(!c.messages) c.messages=[];
+  // Klient xabarlarini o'qilgan deb belgilash
+  if(c.clientMessages&&c.clientMessages.length){
+    let hasUnread=false;
+    c.clientMessages.forEach(m=>{if(!m.adminRead){m.adminRead=true;hasUnread=true;}});
+    if(hasUnread){
+      saveData();
+      updateMsgCount();
+    }
+  }
   document.getElementById('msgModalTitle').textContent=c.name+' — Xabarlar';
   const clientMsgs=c.clientMessages||[];
   const msgs=c.messages;
